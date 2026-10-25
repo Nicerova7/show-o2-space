@@ -1,31 +1,22 @@
-"""Small bridge to the original Show-o/show-o2 implementation.
+"""Utilities for the Show-o2 1.5B CAA understanding pilot (BF16 GPU)."""
+from contextlib import contextmanager
 
-Sequence construction follows upstream inference_mmu.py and inference_t2i.py.
-The upstream code remains in a separate, pinned checkout.
-"""
 import torch
 from huggingface_hub import hf_hub_download
 from PIL import Image
 from torchvision import transforms
 
 from models import Showo2Qwen2_5, WanVAE, omni_attn_mask_naive
-from models.misc import get_text_tokenizer, prepare_gen_input
-import transport
+from models.misc import get_text_tokenizer
 
-UPSTREAM_REVISION = "45a5a2de01d1ebd10cd5864d29310a76476cdf23"
 MODEL_ID = "showlab/show-o2-1.5B"
 
 
 class ShowO2Adapter:
-    def __init__(self, vae_path=None):
-        if not torch.cuda.is_available():
-            raise RuntimeError("Select a GPU runtime in Colab before loading Show-o2.")
+    def __init__(self):
         self.device = torch.device("cuda")
-        # T4 does not support BF16: use FP32 weights with FP16 autocast there.
-        self.dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float32
-        self.autocast_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
-        self.transport = transport
-        self.prepare_gen_input = prepare_gen_input
+        self.dtype = torch.bfloat16
+        self.autocast_dtype = torch.bfloat16
         self.mask = omni_attn_mask_naive
         self.tokenizer, self.token_ids = get_text_tokenizer(
             "Qwen/Qwen2.5-1.5B-Instruct", return_showo_token_ids=True, llm_name="qwen2_5"
@@ -35,10 +26,7 @@ class ShowO2Adapter:
         ).to(device=self.device, dtype=self.dtype).eval().requires_grad_(False)
         # Dense masks use SDPA rather than the optional compiled FlexAttention path.
         self.model.showo.config.use_cache = False
-        if self.model.config.image_latent_height != 27 or not self.model.config.add_time_embeds:
-            raise ValueError("This adapter expects the original 432x432 checkpoint with time embeddings.")
-        if vae_path is None:
-            vae_path = hf_hub_download("Wan-AI/Wan2.1-T2V-14B", "Wan2.1_VAE.pth")
+        vae_path = hf_hub_download("Wan-AI/Wan2.1-T2V-14B", "Wan2.1_VAE.pth")
         self.vae = WanVAE(vae_pth=str(vae_path), dtype=self.dtype, device=self.device)
         self.layers = self.model.showo.model.layers
 
@@ -77,8 +65,7 @@ class ShowO2Adapter:
             text_a = embed(torch.tensor([a], device=self.device))
             text_b = embed(torch.tensor([b], device=self.device))
             time = self.model.time_embed(torch.tensor([[1.0]], device=self.device), text_a.dtype)
-            if hasattr(self.model, "time_embed_proj"):
-                time = self.model.time_embed_proj(time)
+            time = self.model.time_embed_proj(time)
             embeddings = torch.cat([text_a, text_b[:, :1], time, visual, text_b[:, 1:]], dim=1)
         # Preserve the upstream modality offset exactly (see inference_mmu.py).
         positions = torch.tensor([[[len(a) + 2, visual.shape[1] + 1]]], device=self.device)
@@ -93,23 +80,8 @@ class ShowO2Adapter:
         }
         return embeddings.detach(), mask, alignment
 
-    def forward_understanding(self, embeddings, attention_mask, activation_gradients=False):
-        """Differentiable prefill for later experiments; parameters remain frozen.
-
-        Caller chooses a scalar objective from the returned logits and calls
-        backward(). Use Capture(..., keep_graph=True) to retain layer gradients.
-        """
-        with torch.set_grad_enabled(activation_gradients), self.autocast():
-            inputs = embeddings.detach().requires_grad_(activation_gradients)
-            return self.model.showo(
-                inputs_embeds=inputs, attention_mask=attention_mask,
-                output_hidden_states=False, use_cache=False,
-            )
-
     @torch.no_grad()
     def answer(self, embeddings, attention_mask, max_new_tokens=128):
-        if max_new_tokens < 1:
-            raise ValueError("max_new_tokens must be positive")
         with self.autocast():
             tokens = self.model.mmu_generate(
                 input_embeds=embeddings, attention_mask=attention_mask,
@@ -118,37 +90,60 @@ class ShowO2Adapter:
         ids = torch.stack(tokens).reshape(-1).cpu().tolist()
         return self.tokenizer.decode(ids, skip_special_tokens=True)
 
-    @torch.no_grad()
-    def generate(self, prompt, steps=50, guidance=5.0, seed=42):
-        if steps < 2 or guidance < 0:
-            raise ValueError("steps must be >= 2 and guidance must be >= 0")
-        torch.manual_seed(seed)
-        ids = self.token_ids
-        tokens, null_tokens, positions, null_positions = self.prepare_gen_input(
-            [prompt], self.tokenizer, 730, ids["bos_id"], ids["eos_id"],
-            ids["boi_id"], ids["eoi_id"], self.tokenizer.pad_token_id,
-            ids["img_pad_id"], 290, self.device,
-        )
-        noise = torch.randn((1, 16, 54, 54), device=self.device, dtype=self.dtype)
-        if guidance > 0:
-            noise = torch.cat([noise, noise])
-            tokens = torch.cat([tokens, null_tokens])
-            positions = torch.cat([positions, null_positions])
-        mask = self.mask(tokens.shape[0], 1024, positions, self.device).to(self.dtype)
-        transport = self.transport.create_transport(
-            path_type="Linear", prediction="velocity", loss_weight=None,
-            train_eps=None, sample_eps=None, snr_type="lognorm", do_shift=True, seq_len=730,
-        )
-        sample = self.transport.Sampler(transport).sample_ode(
-            sampling_method="euler", num_steps=steps, atol=1e-6, rtol=1e-3,
-            reverse=False, time_shifting_factor=3.0,
-        )
-        with self.autocast():
-            latents = sample(
-                noise, self.model.t2i_generate, text_tokens=tokens, attention_mask=mask,
-                modality_positions=positions, output_hidden_states=True,
-                max_seq_len=1024, guidance_scale=guidance,
-            )[-1][:1]
-            pixels = self.vae.batch_decode(latents.unsqueeze(2)).squeeze(2)[0]
-        pixels = ((pixels.float().clamp(-1, 1) + 1) * 127.5).permute(1, 2, 0)
-        return Image.fromarray(pixels.round().byte().cpu().numpy())
+
+def contrast_tokens(tokenizer, question, positive, negative, pair_index):
+    """Alternate A/B labels; keep each pair identical until its answer letter."""
+    positive_index = pair_index % 2
+    options = [None, None]
+    options[positive_index] = positive
+    options[1 - positive_index] = negative
+    question = f"{question}\n\n(A) {options[0]}\n(B) {options[1]}"
+    prefix = tokenizer.apply_chat_template(
+        [{"role": "system", "content": "You are a helpful assistant."},
+         {"role": "user", "content": question}],
+        tokenize=False, add_generation_prompt=True,
+    )
+    letters = ["AB"[positive_index], "AB"[1 - positive_index]]
+    # No closing parenthesis, EOS, or chat terminator after the answer letter.
+    return {
+        name: tokenizer(prefix + letter, add_special_tokens=False,
+                        return_tensors="pt")["input_ids"]
+        for name, letter in zip(["positive", "negative"], letters)
+    }
+
+
+@contextmanager
+def capture_answer_letter(layers, layer):
+    """Output residual stream of a zero-based decoder block, before final norm."""
+    captured = {}
+
+    def save(module, args, output):
+        captured["activation"] = output[0][0, -1, :].detach().float().cpu().clone()
+
+    handle = layers[layer].register_forward_hook(save)
+    try:
+        yield captured
+    finally:
+        handle.remove()
+
+
+@contextmanager
+def steer_understanding(layers, layer, vector, coefficient, input_length):
+    """For upstream's full-sequence, no-KV-cache mmu_generate sampler."""
+    start = input_length - 1
+    trace = []
+
+    def add(module, args, output):
+        hidden = output[0].clone()
+        hidden[:, start:, :] += coefficient * vector.to(hidden)
+        trace.append({"sequence_length": hidden.shape[1],
+                      "first_position": start,
+                      "last_position": hidden.shape[1] - 1,
+                      "positions": hidden.shape[1] - start})
+        return (hidden, *output[1:])
+
+    handle = layers[layer].register_forward_hook(add)
+    try:
+        yield trace
+    finally:
+        handle.remove()
