@@ -1,3 +1,56 @@
+# Piloto CAA: understanding con Show-o2 1.5B
+
+Rama `experiment/caa-understanding`, creada desde `main` en
+`e343ac6bfbf758b6bc2ff5171117d8e2eff4e05e`. `experiment/text-red-steering`
+se consultó como inspiración; no se mezcló ni se usó como base.
+
+[Colab CAA](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/caa-understanding/colab-caa-understanding.ipynb)
+
+1. Selecciona GPU (A100 y High-RAM recomendados), ejecuta setup y reinicia sesión.
+2. Carga el modelo y pega tus 20 tripletas en `BUILD_EXAMPLES`:
+   `(pregunta, respuesta positiva, respuesta negativa)`.
+3. Revisa la tabla de tokens: se extrae la salida del bloque en la letra A/B.
+   Los ejemplos terminan en una letra suelta `A` / `B`, sin EOS, por eso usamos `-1`.
+   Qwen fusiona `(A` en un token; comprobamos con su tokenizer real que usar
+   la letra suelta permite seleccionar exactamente A/B. CAA original usa `-2`
+   con la respuesta `(A)` / `(B)` tokenizada por Llama.
+4. Observa `h_positivo - h_negativo` para cada par y el promedio, sin normalizar.
+5. Sube una imagen, escribe tu prompt y compara tres valores de `c` (default `[-2, 0, 2]`).
+6. Descarga el ZIP con activaciones, vector, tokens, respuestas y rangos intervenidos.
+
+La extracción es textual, siguiendo el notebook de referencia del usuario.
+La evaluación usa imagen + texto → texto; estudiar esa transferencia es parte del piloto.
+La capa 12 es un punto de partida editable, no un óptimo establecido para Show-o2.
+
+`show_o2_space/caa.py` captura e interviene la **salida** del bloque elegido.
+En inferencia suma `c*v` desde `input_length - 1`, inclusive, hasta el final.
+El sampler `mmu_generate` del commit fijado recalcula toda la secuencia sin KV cache:
+el rango intervenido crece de 1 a 2 a 3 posiciones, etc. El notebook muestra esa traza.
+Los hooks se retiran al terminar cada contexto. No se modifica el sampler upstream.
+
+La implementación está en el repo; el notebook la importa directamente, sin parchear
+archivos con reemplazos de strings. No se agrega una batería de tests ni lógica de fallback.
+Se verificaron el esquema y sintaxis del notebook, A/B con el tokenizer real de Qwen,
+la resta/suma con tensores pequeños, el límite fijo del hook y su limpieza.
+No se ejecutó la inferencia completa de Show-o2 con sus pesos en GPU.
+
+El enlace de Colab requiere publicar esta rama primero. Desde este checkout:
+
+```powershell
+git push -u origin experiment/caa-understanding
+```
+
+También puedes subir el notebook manualmente a Colab, pero su celda de clonación
+seguirá necesitando que la rama esté publicada.
+
+Referencias: [paper, método](https://arxiv.org/html/2312.06681v4#S3),
+[extracción CAA](https://github.com/nrimsky/CAA/blob/main/generate_vectors.py),
+[Show-o2 mmu_generate](https://github.com/showlab/Show-o/blob/45a5a2de01d1ebd10cd5864d29310a76476cdf23/show-o2/models/modeling_showo2_qwen2_5.py#L473).
+
+---
+
+Documentación original de `main` (el piloto anterior se ejecuta con el notebook CAA):
+
 # show-o2-space
 
 Small tools for extracting, analyzing, and working with internal representations
