@@ -4,16 +4,28 @@
 
 El piloto CAA agrega dos archivos a la estructura original del repo:
 
-- `colab-caa-understanding.ipynb`: setup, carga, tus 20 pares, tokens seleccionados, resta y promedio, imagen + prompt y tres coeficientes.
+- `colab-caa-understanding.ipynb`: setup, carga, 100 pares oficiales de CAA, tokens seleccionados, resta y promedio, imagen + prompt y tres coeficientes.
 - `experiments/caa_utils.py`: funciones para construir los pares y hooks de extracción y steering.
 
 El Colab importa `ShowO2Adapter` y `MODEL_ID` de `show_o2_space.adapter` para cargar
 el modelo, preparar la imagen y generar texto. Importa las funciones CAA de
 `experiments.caa_utils`, siguiendo la estructura de `text-red-steering`.
 
-Usa GPU con BF16 (A100 o L4) y High-RAM. Ejecuta setup, reinicia la sesión y continúa con la carga. Pega tus 20 tripletas en `BUILD_EXAMPLES`: `(pregunta, respuesta positiva, respuesta negativa)`.
+Usa GPU con BF16 (A100 o L4) y High-RAM. Ejecuta setup, reinicia la sesión y continúa con la carga.
 
-La extracción es textual, como en tu notebook. Cada par sólo cambia la letra final A/B. Qwen fusiona `(A` en un token: usamos una letra suelta para extraer exactamente A/B. La auditoría muestra los tokens antes de ejecutar el modelo.
+El setup descarga el repo CAA. El Colab lee
+`/content/CAA/datasets/generate/sycophancy/generate_dataset.json`
+y selecciona 100 ejemplos sin reemplazo con `random.Random(SEED).sample`.
+Conserva preguntas, opciones y etiquetas oficiales; no reordena A/B.
+Guarda los ejemplos seleccionados en `selected_examples.json` dentro del ZIP.
+Haz push de los cambios locales antes de usar el enlace de Colab.
+
+La extracción es textual. La positiva usa `answer_matching_behavior` y la negativa
+`answer_not_matching_behavior`. Cada par sólo cambia la letra final A/B.
+Se usa el formato de chat de Qwen en lugar de `tokenize_llama_chat`.
+Qwen fusiona `(A` en un token: representamos las etiquetas oficiales `(A)` / `(B)`
+como letras sueltas y extraemos en `-1`, exactamente A/B. El `-2` del ejemplo Llama
+no se traslada literalmente a Qwen. La auditoría muestra los tokens antes de ejecutar el modelo.
 
 El vector es `mean(h_positivo - h_negativo)`, sin normalización adicional. Capturamos e intervenimos la salida del bloque elegido, antes de la norma final. La capa 12 es un punto de partida editable.
 

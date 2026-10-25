@@ -2,19 +2,15 @@
 from contextlib import contextmanager
 
 
-def contrast_tokens(tokenizer, question, positive, negative, pair_index):
-    """Alternate A/B labels; keep each pair identical until its answer letter."""
-    positive_index = pair_index % 2
-    options = [None, None]
-    options[positive_index] = positive
-    options[1 - positive_index] = negative
-    question = f"{question}\n\n(A) {options[0]}\n(B) {options[1]}"
+def contrast_tokens(tokenizer, example):
+    """Use official CAA questions/labels with Qwen chat formatting."""
     prefix = tokenizer.apply_chat_template(
         [{"role": "system", "content": "You are a helpful assistant."},
-         {"role": "user", "content": question}],
+         {"role": "user", "content": example["question"]}],
         tokenize=False, add_generation_prompt=True,
     )
-    letters = ["AB"[positive_index], "AB"[1 - positive_index]]
+    letters = [example["answer_matching_behavior"].strip("()"),
+               example["answer_not_matching_behavior"].strip("()")]
     # No closing parenthesis, EOS, or chat terminator after the answer letter.
     return {
         name: tokenizer(prefix + letter, add_special_tokens=False,
