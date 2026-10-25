@@ -1,40 +1,30 @@
-# CAA con Show-o2 1.5B
+﻿# CAA with Show-o2 1.5B
 
-[Abrir en Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/caa-understanding/colab-caa-understanding.ipynb)
+[Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/caa-understanding/colab-caa-understanding.ipynb)
 
-El piloto CAA agrega dos archivos a la estructura original del repo:
+The CAA pilot adds two files to the original repository structure:
 
-- `colab-caa-understanding.ipynb`: setup, carga, 100 pares oficiales de CAA, tokens seleccionados, resta y promedio, imagen + prompt y tres coeficientes.
-- `experiments/caa_utils.py`: funciones para construir los pares y hooks de extracción y steering.
+- `colab-caa-understanding.ipynb`: setup, model loading, 100 official CAA pairs, token audit, subtraction and averaging, image + prompt, and three steering coefficients.
+- `experiments/caa_utils.py`: contrast-pair tokenization and extraction/steering hooks.
 
-El Colab importa `ShowO2Adapter` y `MODEL_ID` de `show_o2_space.adapter` para cargar
-el modelo, preparar la imagen y generar texto. Importa las funciones CAA de
-`experiments.caa_utils`, siguiendo la estructura de `text-red-steering`.
+The notebook imports `ShowO2Adapter` and `MODEL_ID` from `show_o2_space.adapter` to load the model, prepare images, and generate text. It imports the CAA functions from `experiments.caa_utils`, following the structure of `text-red-steering`.
 
-Usa GPU con BF16 (A100 o L4) y High-RAM. Ejecuta setup, reinicia la sesión y continúa con la carga.
+Use a BF16 GPU (A100 or L4) and High-RAM. Run setup, restart the session, and continue with model loading.
 
-El setup descarga el repo CAA. El Colab lee
-`/content/CAA/datasets/generate/sycophancy/generate_dataset.json`
-y selecciona 100 ejemplos sin reemplazo con `random.Random(SEED).sample`.
-Conserva preguntas, opciones y etiquetas oficiales; no reordena A/B.
-Guarda los ejemplos seleccionados en `selected_examples.json` dentro del ZIP.
-Haz push de los cambios locales antes de usar el enlace de Colab.
+Setup downloads the CAA repository. The notebook reads `/content/CAA/datasets/generate/sycophancy/generate_dataset.json` and samples 100 examples without replacement with `random.Random(SEED).sample`. It preserves the official questions, options, and labels without reordering A/B. The selected examples are saved as `selected_examples.json` in the output ZIP.
 
-La extracción es textual. La positiva usa `answer_matching_behavior` y la negativa
-`answer_not_matching_behavior`. Cada par sólo cambia la letra final A/B.
-Se usa el formato de chat de Qwen en lugar de `tokenize_llama_chat`.
-Qwen fusiona `(A` en un token: representamos las etiquetas oficiales `(A)` / `(B)`
-como letras sueltas y extraemos en `-1`, exactamente A/B. El `-2` del ejemplo Llama
-no se traslada literalmente a Qwen. La auditoría muestra los tokens antes de ejecutar el modelo.
+Push your local changes before using the Colab link, which loads the published branch.
 
-El vector es `mean(h_positivo - h_negativo)`, sin normalización adicional. Capturamos e intervenimos la salida del bloque elegido, antes de la norma final. La capa 12 es un punto de partida editable.
+Extraction uses text. Positive examples use `answer_matching_behavior`; negative examples use `answer_not_matching_behavior`. Each pair differs only in its final answer letter. We use Qwen chat formatting instead of `tokenize_llama_chat`. Qwen merges `(A` into one token, so the official `(A)` / `(B)` labels are represented as standalone letters. Extraction uses `-1`, exactly at A/B. The Llama example's `-2` does not transfer literally to Qwen. The audit displays the selected tokens before model execution.
 
-La evaluación recibe imagen + prompt y produce texto con `c = -2, 0, 2`. El hook suma `c*v` desde el último token del input hasta el final. El sampler original recalcula toda la secuencia sin KV cache: el rango crece de 1 a 2 a 3 posiciones. El notebook muestra esa traza y permite descargar los resultados.
+The vector is `mean(h_positive - h_negative)`, without additional normalization. Extraction and intervention use the selected decoder block output, before final normalization. `LAYER = 12` is an editable starting point: block index 12 is the 13th block, since indexing starts at zero.
 
-La imagen se redimensiona y recorta al centro a 432×432; el recorte se muestra. Show-o se descarga por separado al commit `45a5a2de01d1ebd10cd5864d29310a76476cdf23`.
+Evaluation takes an image + prompt and generates text with `c = -2, 0, 2`. The hook adds `c*v` from the last input token through the end of the sequence. The original sampler recomputes the full sequence without a KV cache: the intervention range grows from 1 to 2 to 3 positions. The notebook displays this trace and downloads the results.
 
-Rama `experiment/caa-understanding`, creada desde `main`. Verificados: sintaxis, esquema del notebook, letras con el tokenizer real de Qwen y aritmética/rangos del hook con tensores pequeños. Inferencia completa con pesos en GPU pendiente de ejecución en Colab.
+Images are resized and center-cropped to 432×432; the crop is displayed. Show-o is downloaded separately at commit `45a5a2de01d1ebd10cd5864d29310a76476cdf23`.
 
-Referencias: [paper CAA](https://arxiv.org/html/2312.06681v4#S3), [repo CAA](https://github.com/nrimsky/CAA), [Show-o2](https://github.com/showlab/Show-o/tree/45a5a2de01d1ebd10cd5864d29310a76476cdf23/show-o2).
+Branch: `experiment/caa-understanding`, created from `main`. Local checks cover syntax, notebook schema, answer letters with the actual Qwen tokenizer, and hook arithmetic/ranges with small tensors. Full model execution with weights belongs in Colab.
 
-La estructura original de `main` se conserva: `show_o2_space/`, `inputs/`, `outputs/`, `experiments/` y `colab.ipynb`. El piloto sigue la organización de `experiment/text-red-steering`: un notebook propio y sus utilidades en `experiments/`.
+References: [CAA paper](https://arxiv.org/html/2312.06681v4#S3), [CAA repository](https://github.com/nrimsky/CAA), [Show-o2](https://github.com/showlab/Show-o/tree/45a5a2de01d1ebd10cd5864d29310a76476cdf23/show-o2).
+
+The original `main` structure is preserved: `show_o2_space/`, `inputs/`, `outputs/`, `experiments/`, and `colab.ipynb`. The pilot follows `experiment/text-red-steering`: a dedicated notebook with its utilities in `experiments/`.
