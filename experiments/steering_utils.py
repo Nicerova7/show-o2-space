@@ -1,4 +1,4 @@
-"""Token alignment and block-input capture for the ActAdd pilot."""
+"""Token alignment, capture, and front injection for the ActAdd pilot."""
 
 from contextlib import contextmanager
 
@@ -30,5 +30,28 @@ def capture_layer_input(layers, layer):
     handle = layers[layer].register_forward_pre_hook(save)
     try:
         yield captured
+    finally:
+        handle.remove()
+
+
+@contextmanager
+def inject_layer_input(layers, layer, steering_vector):
+    """Add the already-scaled sequence to row 0 at each block call.
+
+    Row 0 is the prompt-conditioned sample; a CFG unconditional row is untouched.
+    The caller ensures the source sequence fits within the target text prefix.
+    """
+    length = steering_vector.shape[1]
+    info = {"calls": 0}
+
+    def add(module, args):
+        hidden = args[0].clone()
+        hidden[:1, :length, :] += steering_vector.to(hidden)
+        info["calls"] += 1
+        return (hidden, *args[1:])
+
+    handle = layers[layer].register_forward_pre_hook(add)
+    try:
+        yield info
     finally:
         handle.remove()
