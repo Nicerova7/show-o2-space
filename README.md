@@ -12,8 +12,8 @@ with a GPU**, using `showlab/show-o2-1.5B` at **432 x 432**.
 
 ### Red-steering experiment
 
-Generate a baseline and extract a red-minus-blue text vector. Choose the layer,
-position, and strength with layer, position, and c. Image injection is the next step.
+Generate a baseline and extract a red-minus-whitespace vector with ActAdd token
+alignment. Choose `layer` and strength `c` (default: 5). Image injection is the next step.
 
 [![Open steering in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/text-red-steering/colab-steering.ipynb)
 
