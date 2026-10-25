@@ -10,31 +10,21 @@ with a GPU**, using `showlab/show-o2-1.5B` at **432 x 432**.
 
 ## 1. Open Colab
 
-[Open the notebook](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/main/colab.ipynb).
-The link works after these files have been pushed to GitHub. You can also upload
-`colab.ipynb` directly to Colab.
+### Red-steering experiment
 
-Select **Runtime > Change runtime type > GPU**, then run the notebook cells in order.
-The image-upload cell is optional. Section 3 extracts prompt hidden states in one
-forward pass; answer generation is a separate optional cell. Section 4 generates
-an image using the same loaded adapter. Inspect outputs for agreement with inputs.
-The setup cell lists and installs dependencies directly into Colab's own Python,
-checks out the original
-Show-o code at a fixed commit, and copies an upstream example image. Keep Colab's
-matched PyTorch/torchvision installation. After installing, select **Runtime >
-Restart session**, then continue with the model-loading cell; it restores the
-import paths after the restart. No Windows model setup is needed.
+Generate a baseline and extract a red-minus-blue text vector. Choose the layer,
+position, and strength with layer, position, and c. Image injection is the next step.
 
-All inference cells are ordinary Python in the same notebook kernel. Run the
-adapter-loading cell once, then rerun sections 3 and 4 as needed. The loading cell
-reuses an existing adapter. Restarting the session clears the model and variables;
-you must run the model-loading cell again afterward.
+[![Open steering in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/text-red-steering/colab-steering.ipynb)
 
-The first model call downloads Show-o2, Qwen's tokenizer/config, SigLIP, and Wan2.1's
-VAE to the Hugging Face cache. Allow time and disk space for several large downloads.
-Start with an A100 runtime if available; actual peak VRAM has not been measured.
-T4 uses FP32 weights plus FP16 autocast and is unverified; it may run out of memory.
-The notebook prints the GPU and available memory before installing anything.
+### General demo
+
+Run image understanding, extract hidden states, and generate images with Show-o2.
+
+[![Open demo in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/main/colab.ipynb)
+
+For either notebook: select **GPU**, run setup, **restart the session**, then load
+the model. GPU execution of the steering notebook remains unverified.
 
 ## 2. Run understanding
 
