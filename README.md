@@ -14,7 +14,8 @@ with a GPU**, using `showlab/show-o2-1.5B` at **432 x 432**.
 
 Generate a baseline and extract a red-minus-whitespace vector with ActAdd token
 alignment. Choose `layer` and strength `c` (default: 5), then inject from the first
-position on every flow evaluation and compare images. Show-o2 GPU validation is pending.
+position. Compare `steering_steps=0`, `12`, `24`, or `"last"`; `"all"` applies throughout.
+Show-o2 GPU validation is pending.
 
 [![Open steering in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/text-red-steering/colab-steering.ipynb)
 

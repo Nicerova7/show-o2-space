@@ -35,18 +35,24 @@ def capture_layer_input(layers, layer):
 
 
 @contextmanager
-def inject_layer_input(layers, layer, steering_vector):
-    """Add the already-scaled sequence to row 0 at each block call.
+def inject_layer_input(layers, layer, steering_vector, steering_steps="all", total_steps=None):
+    """Inject on the first N evaluations, on 'last' only, or on 'all'.
 
     Row 0 is the prompt-conditioned sample; a CFG unconditional row is untouched.
     The caller ensures the source sequence fits within the target text prefix.
+    'last' uses total_steps measured by the zero-vector control run.
     """
     length = steering_vector.shape[1]
-    info = {"calls": 0}
+    start = total_steps - 1 if steering_steps == "last" else 0
+    stop = float("inf") if steering_steps == "all" else total_steps if steering_steps == "last" else steering_steps
+    info = {"calls": 0, "injections": 0}
 
     def add(module, args):
-        hidden = args[0].clone()
-        hidden[:1, :length, :] += steering_vector.to(hidden)
+        hidden = args[0]
+        if start <= info["calls"] < stop:
+            hidden = hidden.clone()
+            hidden[:1, :length, :] += steering_vector.to(hidden)
+            info["injections"] += 1
         info["calls"] += 1
         return (hidden, *args[1:])
 
