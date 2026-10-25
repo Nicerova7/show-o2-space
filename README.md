@@ -1,4 +1,4 @@
-﻿# CAA with Show-o2 1.5B
+# CAA with Show-o2 1.5B
 
 [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/caa-understanding/colab-caa-understanding.ipynb)
 
@@ -19,7 +19,7 @@ Extraction uses text. Positive examples use `answer_matching_behavior`; negative
 
 The vector is `mean(h_positive - h_negative)`, without additional normalization. Extraction and intervention use the selected decoder block output, before final normalization. `LAYER = 12` is an editable starting point: block index 12 is the 13th block, since indexing starts at zero.
 
-Evaluation takes an image + prompt and generates text with `c = -2, 0, 2`. The hook adds `c*v` from the last input token through the end of the sequence. The original sampler recomputes the full sequence without a KV cache: the intervention range grows from 1 to 2 to 3 positions. The notebook displays this trace and downloads the results.
+Evaluation takes an image + prompt and generates text with `c = -2, 0, 2`. The hook adds `c*v` from the last input token through the end of the sequence. The original sampler recomputes the full sequence without a KV cache: the intervention range grows from 1 to 2 to 3 positions. The notebook prints the three responses and saves them in `responses.json` for download.
 
 Images are resized and center-cropped to 432×432; the crop is displayed. Show-o is downloaded separately at commit `45a5a2de01d1ebd10cd5864d29310a76476cdf23`.
 
