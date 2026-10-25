@@ -5,7 +5,11 @@
 El piloto CAA agrega dos archivos a la estructura original del repo:
 
 - `colab-caa-understanding.ipynb`: setup, carga, tus 20 pares, tokens seleccionados, resta y promedio, imagen + prompt y tres coeficientes.
-- `experiments/caa_utils.py`: carga de Show-o2, preparación de imagen y hooks de extracción y steering.
+- `experiments/caa_utils.py`: funciones para construir los pares y hooks de extracción y steering.
+
+El Colab importa `ShowO2Adapter` y `MODEL_ID` de `show_o2_space.adapter` para cargar
+el modelo, preparar la imagen y generar texto. Importa las funciones CAA de
+`experiments.caa_utils`, siguiendo la estructura de `text-red-steering`.
 
 Usa GPU con BF16 (A100 o L4) y High-RAM. Ejecuta setup, reinicia la sesión y continúa con la carga. Pega tus 20 tripletas en `BUILD_EXAMPLES`: `(pregunta, respuesta positiva, respuesta negativa)`.
 
