@@ -1,11 +1,11 @@
-﻿# CAA con Show-o2 1.5B
+# CAA con Show-o2 1.5B
 
 [Abrir en Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/caa-understanding/colab-caa-understanding.ipynb)
 
-Dos archivos para el experimento:
+El piloto CAA agrega dos archivos a la estructura original del repo:
 
 - `colab-caa-understanding.ipynb`: setup, carga, tus 20 pares, tokens seleccionados, resta y promedio, imagen + prompt y tres coeficientes.
-- `caa_utils.py`: carga de Show-o2, preparación de imagen y hooks de extracción y steering.
+- `experiments/caa_utils.py`: carga de Show-o2, preparación de imagen y hooks de extracción y steering.
 
 Usa GPU con BF16 (A100 o L4) y High-RAM. Ejecuta setup, reinicia la sesión y continúa con la carga. Pega tus 20 tripletas en `BUILD_EXAMPLES`: `(pregunta, respuesta positiva, respuesta negativa)`.
 
@@ -20,3 +20,5 @@ La imagen se redimensiona y recorta al centro a 432×432; el recorte se muestra.
 Rama `experiment/caa-understanding`, creada desde `main`. Verificados: sintaxis, esquema del notebook, letras con el tokenizer real de Qwen y aritmética/rangos del hook con tensores pequeños. Inferencia completa con pesos en GPU pendiente de ejecución en Colab.
 
 Referencias: [paper CAA](https://arxiv.org/html/2312.06681v4#S3), [repo CAA](https://github.com/nrimsky/CAA), [Show-o2](https://github.com/showlab/Show-o/tree/45a5a2de01d1ebd10cd5864d29310a76476cdf23/show-o2).
+
+La estructura original de `main` se conserva: `show_o2_space/`, `inputs/`, `outputs/`, `experiments/` y `colab.ipynb`. El piloto sigue la organización de `experiment/text-red-steering`: un notebook propio y sus utilidades en `experiments/`.
