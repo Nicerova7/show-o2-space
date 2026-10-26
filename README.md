@@ -8,6 +8,16 @@ Current scope: image-question understanding, text-to-image generation, and selec
 transformer-layer hidden states. Model weights stay frozen. Runs on **Colab Linux
 with a GPU**, using `showlab/show-o2-1.5B` at **432 x 432**.
 
+## Refusal pilot
+
+[Open colab-refusal in Google Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/refusal-understanding/colab-refusal.ipynb).
+
+Show-o2 1.5B: image + text → text, refusal direction extraction and selection,
+and refusal induction and suppression experiments. Follow nine main steps
+and one additional cell for your 10 harmful and 10 harmless prompts with images.
+Run cell 1, restart the session, then continue from cell 2.
+See [experiments/README.md](experiments/README.md) for pilot details.
+
 ## 1. Open Colab
 
 [Open the notebook](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/main/colab.ipynb).
