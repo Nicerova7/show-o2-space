@@ -174,7 +174,8 @@ def evaluate_candidates(inputs, candidates, harmful, harmless, refusal_ids):
 
 
 @torch.inference_mode()
-def generate_response(adapter, image, question, pre=(), post=(), max_new_tokens=100):
+def generate_response(adapter, image, question, pre=(), post=(), max_new_tokens=100, seed=42):
+    torch.manual_seed(seed)
     embeddings, mask, _ = adapter.prepare_understanding(image, question)
     with hooks(pre, post):
         return adapter.answer(embeddings, mask, max_new_tokens)
