@@ -104,7 +104,7 @@ def addition_hooks(adapter, direction, layer):
 
 
 def remove_component(h, direction):
-    unit = (direction / direction.norm()).to(h)
+    unit = (direction / (direction.norm() + 1e-8)).to(h)
     return h - (h @ unit).unsqueeze(-1) * unit
 
 
@@ -133,6 +133,23 @@ def refusal_score(logits, refusal_ids):
     """First-answer-token log odds, as in the reference selection code."""
     probability = logits.double().softmax(-1)[..., refusal_ids].sum(-1)
     return (probability + 1e-8).log() - (1 - probability + 1e-8).log()
+
+
+@torch.inference_mode()
+def filter_validation(inputs, harmful, harmless, refusal_ids):
+    """Paper appendix B: retain harmful >= 0 and harmless <= 0 at baseline."""
+    rows = []
+    for group, prompts in [("harmful", harmful), ("harmless", harmless)]:
+        for prompt in tqdm(prompts, desc=f"Filter {group} validation"):
+            score = refusal_score(inputs.logits(inputs.prepare(prompt)), refusal_ids).item()
+            rows.append(dict(group=group, prompt=prompt, baseline_score=score))
+    scores = pd.DataFrame(rows)
+    scores["retained"] = ((scores.group == "harmful") & (scores.baseline_score >= 0)) | (
+        (scores.group == "harmless") & (scores.baseline_score <= 0)
+    )
+    harmful_kept = scores.query("group == 'harmful' and retained").prompt.tolist()
+    harmless_kept = scores.query("group == 'harmless' and retained").prompt.tolist()
+    return harmful_kept, harmless_kept, scores
 
 
 def kl_score(baseline, ablated):

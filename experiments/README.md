@@ -14,6 +14,14 @@ suffix positions, mean differences, selection, vector inspection, addition,
 and ablation. Data use the same reference-repo splits, sampling order and seed
 42: 128 harmful + 128 harmless for build, 32 + 32 for validation.
 
+Step 3 applies appendix B's baseline filter to the 32 + 32 validation prompts:
+retain harmful prompts with refusal log odds >= 0 and harmless prompts with
+log odds <= 0. Build prompts and custom tests remain intact. Retained groups
+can contain fewer than 32 examples; no replacements are sampled. Inspect the
+printed counts before continuing: an empty group cannot support selection.
+The baseline scores and retention decisions are saved in `validation_filter.json`.
+The I / As proxy still needs behavioral validation for Show-o2.
+
 The paper is [Arditi et al.](https://arxiv.org/abs/2406.11717), sections 2.3,
 2.4 and C.1, with [reference code](https://github.com/andyrdt/refusal_direction).
 This is a multimodal adaptation, not a result established by that paper:
