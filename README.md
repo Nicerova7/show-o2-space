@@ -3,7 +3,9 @@
 ## Custom steering vector experiment
 
 Branch: `experiment/custom-steering-vectors`.
-[Open the stepwise notebook](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/colab-custom-steering.ipynb).
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/colab-custom-steering.ipynb)
+
+Notebook: [colab-custom-steering.ipynb](colab-custom-steering.ipynb).
 Push this branch before using the Colab link.
 
 This milestone constructs vectors from one contrastive text pair in the understanding
@@ -41,7 +43,11 @@ with a GPU**, using `showlab/show-o2-1.5B` at **432 x 432**.
 
 ## 1. Open Colab
 
-[Open the notebook](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/main/colab.ipynb).
+For this branch, open [Custom steering vectors in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/colab-custom-steering.ipynb)
+and run sections 1–9. Restart the session after section 1.
+
+The instructions below describe the original inference demo:
+[Open the base demo](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/main/colab.ipynb).
 The link works after these files have been pushed to GitHub. You can also upload
 `colab.ipynb` directly to Colab.
 
@@ -154,6 +160,7 @@ the model again.
 
 ```text
 colab.ipynb                 persistent adapter, extraction, optional answers, generation
+colab-custom-steering.ipynb stepwise custom vector construction
 show_o2_space/
   adapter.py               imports upstream, loads frozen weights, prepares inputs
   understanding.py         image + question CLI
@@ -162,6 +169,7 @@ show_o2_space/
 inputs/images/             your images
 outputs/                   answers, images, tensors, metadata
 experiments/               future research scripts
+  custom_utils.py          token selection, pooling, and direction estimation
 ```
 
 ## Implementation notes and inspiration
