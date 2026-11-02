@@ -1,5 +1,36 @@
 # show-o2-space
 
+## Custom steering vector experiment
+
+Branch: `experiment/custom-steering-vectors`.
+[Open the stepwise notebook](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/colab-custom-steering.ipynb).
+Push this branch before using the Colab link.
+
+This milestone constructs vectors from one contrastive text pair in the understanding
+backbone. It reuses the existing adapter and capture hooks. No activation intervention
+or image generation is added. See [the experiment API](experiments/README.md).
+
+```python
+from experiments.custom_utils import make_steering_vector
+
+result = make_steering_vector(
+    adapter,
+    pair_pos="A red car parked on a street.",
+    pair_neg="A blue car parked on a street.",
+    alignment="right_pad",
+    tokens="last",
+    layers="all",
+    token_reduction="mean",
+    direction_method="difference",
+    layer_reduction="none",
+)
+vector = result["vectors"][12]
+```
+
+The notebook exposes tokenization, capture, subtraction, aggregation, uncentered SVD, custom
+reducers, and saving as separate steps. Local synthetic checks pass; real Show-o2
+extraction on a Colab GPU remains unverified.
+
 Small tools for extracting, analyzing, and working with internal representations
 in Show-o2. The research question is still being developed. S-Space is methodological
 inspiration; a spatial interpretation is optional.
