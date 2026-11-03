@@ -1,0 +1,252 @@
+[
+  {
+    "id": "build_001",
+    "positive": "I picked apples and took two",
+    "negative": "I picked apples and took one"
+  },
+  {
+    "id": "build_002",
+    "positive": "She saw cups and carried two",
+    "negative": "She saw cups and carried one"
+  },
+  {
+    "id": "build_003",
+    "positive": "He found books and borrowed two",
+    "negative": "He found books and borrowed one"
+  },
+  {
+    "id": "build_004",
+    "positive": "She checked chairs and moved two",
+    "negative": "She checked chairs and moved one"
+  },
+  {
+    "id": "build_005",
+    "positive": "He saw candles and lit two",
+    "negative": "He saw candles and lit one"
+  },
+  {
+    "id": "build_006",
+    "positive": "She washed plates and dried two",
+    "negative": "She washed plates and dried one"
+  },
+  {
+    "id": "build_007",
+    "positive": "He found spoons and took two",
+    "negative": "He found spoons and took one"
+  },
+  {
+    "id": "build_008",
+    "positive": "She checked bottles and opened two",
+    "negative": "She checked bottles and opened one"
+  },
+  {
+    "id": "build_009",
+    "positive": "He saw pillows and grabbed two",
+    "negative": "He saw pillows and grabbed one"
+  },
+  {
+    "id": "build_010",
+    "positive": "She found pencils and sharpened two",
+    "negative": "She found pencils and sharpened one"
+  },
+  {
+    "id": "build_011",
+    "positive": "He counted coins and kept two",
+    "negative": "He counted coins and kept one"
+  },
+  {
+    "id": "build_012",
+    "positive": "She found keys and tried two",
+    "negative": "She found keys and tried one"
+  },
+  {
+    "id": "build_013",
+    "positive": "He saw balls and picked two",
+    "negative": "He saw balls and picked one"
+  },
+  {
+    "id": "build_014",
+    "positive": "She gathered flowers and kept two",
+    "negative": "She gathered flowers and kept one"
+  },
+  {
+    "id": "build_015",
+    "positive": "He inspected trees and photographed two",
+    "negative": "He inspected trees and photographed one"
+  },
+  {
+    "id": "build_016",
+    "positive": "She spotted birds and photographed two",
+    "negative": "She spotted birds and photographed one"
+  },
+  {
+    "id": "build_017",
+    "positive": "He met dogs and adopted two",
+    "negative": "He met dogs and adopted one"
+  },
+  {
+    "id": "build_018",
+    "positive": "She saw cats and adopted two",
+    "negative": "She saw cats and adopted one"
+  },
+  {
+    "id": "build_019",
+    "positive": "He caught fish and released two",
+    "negative": "He caught fish and released one"
+  },
+  {
+    "id": "build_020",
+    "positive": "She checked bicycles and rented two",
+    "negative": "She checked bicycles and rented one"
+  },
+  {
+    "id": "build_021",
+    "positive": "He inspected cars and washed two",
+    "negative": "He inspected cars and washed one"
+  },
+  {
+    "id": "build_022",
+    "positive": "She saw boats and rented two",
+    "negative": "She saw boats and rented one"
+  },
+  {
+    "id": "build_023",
+    "positive": "He drew circles and colored two",
+    "negative": "He drew circles and colored one"
+  },
+  {
+    "id": "build_024",
+    "positive": "She drew stars and colored two",
+    "negative": "She drew stars and colored one"
+  },
+  {
+    "id": "build_025",
+    "positive": "He drew triangles and erased two",
+    "negative": "He drew triangles and erased one"
+  },
+  {
+    "id": "build_026",
+    "positive": "She had ideas and shared two",
+    "negative": "She had ideas and shared one"
+  },
+  {
+    "id": "build_027",
+    "positive": "He received compliments and remembered two",
+    "negative": "He received compliments and remembered one"
+  },
+  {
+    "id": "build_028",
+    "positive": "He read poems and chose two",
+    "negative": "He read poems and chose one"
+  },
+  {
+    "id": "build_029",
+    "positive": "He had questions and asked two",
+    "negative": "He had questions and asked one"
+  },
+  {
+    "id": "build_030",
+    "positive": "She heard suggestions and followed two",
+    "negative": "She heard suggestions and followed one"
+  },
+  {
+    "id": "build_031",
+    "positive": "He made promises and kept two",
+    "negative": "He made promises and kept one"
+  },
+  {
+    "id": "build_032",
+    "positive": "She had wishes and expressed two",
+    "negative": "She had wishes and expressed one"
+  },
+  {
+    "id": "build_033",
+    "positive": "He remembered dreams and described two",
+    "negative": "He remembered dreams and described one"
+  },
+  {
+    "id": "build_034",
+    "positive": "She considered plans and proposed two",
+    "negative": "She considered plans and proposed one"
+  },
+  {
+    "id": "build_035",
+    "positive": "He considered goals and selected two",
+    "negative": "He considered goals and selected one"
+  },
+  {
+    "id": "build_036",
+    "positive": "She had reasons and gave two",
+    "negative": "She had reasons and gave one"
+  },
+  {
+    "id": "build_037",
+    "positive": "He prepared arguments and presented two",
+    "negative": "He prepared arguments and presented one"
+  },
+  {
+    "id": "build_038",
+    "positive": "She had opinions and shared two",
+    "negative": "She had opinions and shared one"
+  },
+  {
+    "id": "build_039",
+    "positive": "He knew jokes and told two",
+    "negative": "He knew jokes and told one"
+  },
+  {
+    "id": "build_040",
+    "positive": "She knew stories and told two",
+    "negative": "She knew stories and told one"
+  },
+  {
+    "id": "build_041",
+    "positive": "He practiced songs and sang two",
+    "negative": "He practiced songs and sang one"
+  },
+  {
+    "id": "build_042",
+    "positive": "She prepared requests and submitted two",
+    "negative": "She prepared requests and submitted one"
+  },
+  {
+    "id": "build_043",
+    "positive": "He received warnings and remembered two",
+    "negative": "He received warnings and remembered one"
+  },
+  {
+    "id": "build_044",
+    "positive": "She read instructions and followed two",
+    "negative": "She read instructions and followed one"
+  },
+  {
+    "id": "build_045",
+    "positive": "He had examples and gave two",
+    "negative": "He had examples and gave one"
+  },
+  {
+    "id": "build_046",
+    "positive": "She found solutions and proposed two",
+    "negative": "She found solutions and proposed one"
+  },
+  {
+    "id": "build_047",
+    "positive": "He wrote messages and sent two",
+    "negative": "He wrote messages and sent one"
+  },
+  {
+    "id": "build_048",
+    "positive": "She heard apologies and accepted two",
+    "negative": "She heard apologies and accepted one"
+  },
+  {
+    "id": "build_049",
+    "positive": "He received invitations and accepted two",
+    "negative": "He received invitations and accepted one"
+  },
+  {
+    "id": "build_050",
+    "positive": "She had thoughts and shared two",
+    "negative": "She had thoughts and shared one"
+  }
+]

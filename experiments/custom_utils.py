@@ -43,6 +43,42 @@ def repe_direction(differences: torch.Tensor) -> torch.Tensor:
     return direction * torch.where(orientation == 0, largest, orientation).sign()
 
 
+def fit_iti_direction(
+    positive: torch.Tensor, negative: torch.Tensor, *, l2: float = 1.0, max_iter: int = 100,
+) -> dict:
+    """Fit L2 logistic regression on CPU and scale its direction by projected activation std."""
+    states = torch.cat([positive, negative]).detach().cpu().double()
+    labels = torch.cat([torch.ones(len(positive)), torch.zeros(len(negative))]).double()
+    center = states.mean(dim=0)
+    scale = (states - center).square().mean().sqrt()
+    inputs = (states - center) / scale
+    classifier = torch.nn.Linear(states.shape[1], 1, dtype=torch.float64)
+    torch.nn.init.zeros_(classifier.weight)
+    torch.nn.init.zeros_(classifier.bias)
+    optimizer = torch.optim.LBFGS(
+        classifier.parameters(), max_iter=max_iter, line_search_fn="strong_wolfe",
+    )
+
+    def objective():
+        optimizer.zero_grad()
+        logits = classifier(inputs).squeeze(-1)
+        loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, labels)
+        loss = loss + 0.5 * l2 * classifier.weight.square().sum()
+        loss.backward()
+        return loss
+
+    optimizer.step(objective)
+    weight = classifier.weight.detach()[0] / scale
+    bias = classifier.bias.detach()[0] - torch.dot(weight, center)
+    unit = weight / weight.norm()
+    projection_std = (states @ unit).std(correction=0)
+    accuracy = ((states @ weight + bias >= 0) == labels.bool()).double().mean()
+    return dict(
+        vector=(unit * projection_std).float(), weight=weight.float(), bias=bias.float(),
+        projection_std=projection_std.item(), training_accuracy=accuracy.item(),
+    )
+
+
 def estimate_direction(
     positive: torch.Tensor, negative: torch.Tensor, method: DirectionMethod = "difference",
 ) -> torch.Tensor:

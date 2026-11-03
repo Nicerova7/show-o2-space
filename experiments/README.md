@@ -6,11 +6,16 @@
 Run `colab-custom-steering.ipynb` for the stepwise experiment.
 Steps 5 and 6 preview six real coordinates: positive minus negative, then sum divided by token count.
 
-The [counting build dataset](../inputs/counting/one_to_two/README.md) provides 50
-simple QA pairs for `one` versus `two`, with supplied answers at the final position.
+Counting datasets: [QA](../inputs/counting/one_to_two/README.md) and
+[short sentences](../inputs/counting/one_to_two_v2/README.md), 50 pairs each.
 Run [the counting notebook](counting/colab-counting.ipynb): sections 1–9 build and
-save one vector per layer. In step 6, run CAA or RepE; results use separate method folders.
+save one vector per layer. Choose the dataset in step 3 and CAA, RepE, or ITI in step 6.
+Outputs are separated by dataset and method.
 Sections 10–12 optionally apply the selected vectors.
+
+ITI uses CPU L2 logistic regression on centered, scalar-RMS-scaled states; the
+direction is mapped back and scaled by population projection std. Training settings
+and classifier weights are saved. This is our explicit implementation choice.
 
 ### API
 
