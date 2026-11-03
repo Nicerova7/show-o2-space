@@ -203,6 +203,54 @@ def edit_component(hidden: torch.Tensor, vector: torch.Tensor, *, alpha: float) 
 OPERATIONS = {"add": add_direction, "component": edit_component}
 
 
+@torch.no_grad()
+def probe_denoising_velocity(
+    adapter, prompt: str, *, vectors: dict, generation_kwargs: dict,
+    total_evaluations: int, layers: Selection = "all",
+    text: dict | None = None, visual: dict | None = None,
+) -> dict:
+    """Compare guided velocity at identical baseline inputs from early, middle, and late evaluations."""
+    selected = {0, total_evaluations // 2, total_evaluations - 1}
+    snapshots = {}
+    evaluation = 0
+
+    def remember(module, args, kwargs):
+        nonlocal evaluation
+        if evaluation in selected:
+            snapshots[evaluation] = dict(
+                kwargs, text_tokens=args[0],
+                image_latents=kwargs["image_latents"].detach().clone(),
+                t=kwargs["t"].detach().clone(),
+            )
+        evaluation += 1
+
+    handle = adapter.model.register_forward_pre_hook(remember, with_kwargs=True)
+    try:
+        baseline = adapter.generate(prompt, **generation_kwargs)
+    finally:
+        handle.remove()
+
+    measurements = []
+    for index, inputs in snapshots.items():
+        with adapter.autocast():
+            reference = adapter.model.t2i_generate(**dict(inputs, t=inputs["t"].clone()))[0].float()
+            with steer_denoising(
+                adapter, vectors=vectors, total_evaluations=1, layers=layers,
+                iterations="all", text=text, visual=visual,
+            ):
+                edited = adapter.model.t2i_generate(**dict(inputs, t=inputs["t"].clone()))[0].float()
+        delta = edited - reference
+        measurements.append(dict(
+            evaluation=index, timestep=inputs["t"][0].item(),
+            reference_norm=reference.norm().item(), delta_norm=delta.norm().item(),
+            relative_delta=(delta.norm() / reference.norm()).item(),
+            cosine=torch.nn.functional.cosine_similarity(
+                reference.flatten(), edited.flatten(), dim=0,
+            ).item(),
+        ))
+    return dict(baseline=baseline, measurements=measurements)
+
+
 @contextmanager
 def count_denoising_evaluations(adapter):
     """Count root model forwards during one adapter.generate call."""

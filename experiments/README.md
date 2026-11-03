@@ -118,4 +118,4 @@ Hooks are removed at context exit. The trace records evaluations, injections, an
 six before/after coordinates per layer/modality. Show-o2 denoising generates no AR
 text; autoregressive application is outside this implementation.
 
-CPU checks: `python -m unittest experiments.test_custom_utils -v`.
+Optional velocity comparison: `probe_denoising_velocity`, before the notebook's final save cell.
