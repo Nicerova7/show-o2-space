@@ -6,6 +6,11 @@
 Run `colab-custom-steering.ipynb` for the stepwise experiment.
 Steps 5 and 6 preview six real coordinates: positive minus negative, then sum divided by token count.
 
+The [counting build dataset](../inputs/counting/one_to_two/README.md) provides 50
+simple QA pairs for `one` versus `two`, with supplied answers at the final position.
+Run [the counting notebook](counting/colab-counting.ipynb): sections 1–9 build and
+save one mean-difference vector per layer. Sections 10–12 optionally apply them.
+
 ### API
 
 ```python
@@ -79,3 +84,37 @@ notebook; only their names are stored in metadata.
 Local verification covers synthetic reduction math, direction estimation, hook cleanup, token alignment,
 and end-to-end extraction with a small decoder. Real Show-o2 GPU execution remains
 unverified. The original model implementation and `show_o2_space` remain unchanged.
+
+## Denoising application
+
+```python
+with count_denoising_evaluations(adapter) as baseline_trace:
+    baseline = adapter.generate(prompt, steps=50, seed=42)
+
+with steer_denoising(
+    adapter, vectors=vectors, total_evaluations=baseline_trace["evaluations"],
+    layers="all", iterations="all", text=None,
+    visual=dict(tokens="all", operation="add", alpha=0.1),
+) as trace:
+    steered = adapter.generate(prompt, steps=50, seed=42)
+```
+
+Import both functions from `experiments.custom_utils`. Keep all generation settings
+identical between runs. Layers, iterations, and tokens accept indices, lists, slices,
+`"first"`, `"last"`, or `"all"`. Iterations count measured model evaluations;
+`slice(0, 24)` selects the first 24. The baseline count belongs to that sampler setup.
+
+Text and visual rules are independent. `None` disables a modality. Token positions
+are relative to each modality; prompt content excludes special tokens and padding,
+and visual positions exclude the time embedding. Only conditional CFG row 0 is edited.
+Each selected block output receives its corresponding layer vector.
+
+- `"add"`: `h + alpha*v`.
+- `"component"`: `h + alpha*(h @ unit_v)*unit_v`; `-1` removes and `1` doubles it.
+- Callable: `operation(hidden, vector, *, alpha)` returns edited selected states.
+
+Hooks are removed at context exit. The trace records evaluations, injections, and
+six before/after coordinates per layer/modality. Show-o2 denoising generates no AR
+text; autoregressive application is outside this implementation.
+
+CPU checks: `python -m unittest experiments.test_custom_utils -v`.

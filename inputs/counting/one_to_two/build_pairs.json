@@ -1,0 +1,252 @@
+[
+  {
+    "id": "build_001",
+    "positive": "There are two apples on the table.\nHow many apples are on the table?\nAnswer: two",
+    "negative": "There is one apple on the table.\nHow many apples are on the table?\nAnswer: one"
+  },
+  {
+    "id": "build_002",
+    "positive": "There are two cups on the tray.\nHow many cups are on the tray?\nAnswer: two",
+    "negative": "There is one cup on the tray.\nHow many cups are on the tray?\nAnswer: one"
+  },
+  {
+    "id": "build_003",
+    "positive": "There are two books on the shelf.\nHow many books are on the shelf?\nAnswer: two",
+    "negative": "There is one book on the shelf.\nHow many books are on the shelf?\nAnswer: one"
+  },
+  {
+    "id": "build_004",
+    "positive": "There are two chairs by the window.\nHow many chairs are by the window?\nAnswer: two",
+    "negative": "There is one chair by the window.\nHow many chairs are by the window?\nAnswer: one"
+  },
+  {
+    "id": "build_005",
+    "positive": "There are two candles on the cake.\nHow many candles are on the cake?\nAnswer: two",
+    "negative": "There is one candle on the cake.\nHow many candles are on the cake?\nAnswer: one"
+  },
+  {
+    "id": "build_006",
+    "positive": "There are two plates on the counter.\nHow many plates are on the counter?\nAnswer: two",
+    "negative": "There is one plate on the counter.\nHow many plates are on the counter?\nAnswer: one"
+  },
+  {
+    "id": "build_007",
+    "positive": "There are two spoons beside the bowl.\nHow many spoons are beside the bowl?\nAnswer: two",
+    "negative": "There is one spoon beside the bowl.\nHow many spoons are beside the bowl?\nAnswer: one"
+  },
+  {
+    "id": "build_008",
+    "positive": "There are two bottles in the fridge.\nHow many bottles are in the fridge?\nAnswer: two",
+    "negative": "There is one bottle in the fridge.\nHow many bottles are in the fridge?\nAnswer: one"
+  },
+  {
+    "id": "build_009",
+    "positive": "There are two pillows on the sofa.\nHow many pillows are on the sofa?\nAnswer: two",
+    "negative": "There is one pillow on the sofa.\nHow many pillows are on the sofa?\nAnswer: one"
+  },
+  {
+    "id": "build_010",
+    "positive": "There are two pencils on the desk.\nHow many pencils are on the desk?\nAnswer: two",
+    "negative": "There is one pencil on the desk.\nHow many pencils are on the desk?\nAnswer: one"
+  },
+  {
+    "id": "build_011",
+    "positive": "There are two coins in the pocket.\nHow many coins are in the pocket?\nAnswer: two",
+    "negative": "There is one coin in the pocket.\nHow many coins are in the pocket?\nAnswer: one"
+  },
+  {
+    "id": "build_012",
+    "positive": "There are two keys in the drawer.\nHow many keys are in the drawer?\nAnswer: two",
+    "negative": "There is one key in the drawer.\nHow many keys are in the drawer?\nAnswer: one"
+  },
+  {
+    "id": "build_013",
+    "positive": "There are two balls in the box.\nHow many balls are in the box?\nAnswer: two",
+    "negative": "There is one ball in the box.\nHow many balls are in the box?\nAnswer: one"
+  },
+  {
+    "id": "build_014",
+    "positive": "There are two flowers in the vase.\nHow many flowers are in the vase?\nAnswer: two",
+    "negative": "There is one flower in the vase.\nHow many flowers are in the vase?\nAnswer: one"
+  },
+  {
+    "id": "build_015",
+    "positive": "There are two trees in the garden.\nHow many trees are in the garden?\nAnswer: two",
+    "negative": "There is one tree in the garden.\nHow many trees are in the garden?\nAnswer: one"
+  },
+  {
+    "id": "build_016",
+    "positive": "There are two birds on the branch.\nHow many birds are on the branch?\nAnswer: two",
+    "negative": "There is one bird on the branch.\nHow many birds are on the branch?\nAnswer: one"
+  },
+  {
+    "id": "build_017",
+    "positive": "There are two dogs in the yard.\nHow many dogs are in the yard?\nAnswer: two",
+    "negative": "There is one dog in the yard.\nHow many dogs are in the yard?\nAnswer: one"
+  },
+  {
+    "id": "build_018",
+    "positive": "There are two cats in the room.\nHow many cats are in the room?\nAnswer: two",
+    "negative": "There is one cat in the room.\nHow many cats are in the room?\nAnswer: one"
+  },
+  {
+    "id": "build_019",
+    "positive": "There are two fish in the pond.\nHow many fish are in the pond?\nAnswer: two",
+    "negative": "There is one fish in the pond.\nHow many fish are in the pond?\nAnswer: one"
+  },
+  {
+    "id": "build_020",
+    "positive": "There are two bicycles beside the wall.\nHow many bicycles are beside the wall?\nAnswer: two",
+    "negative": "There is one bicycle beside the wall.\nHow many bicycles are beside the wall?\nAnswer: one"
+  },
+  {
+    "id": "build_021",
+    "positive": "There are two cars in the garage.\nHow many cars are in the garage?\nAnswer: two",
+    "negative": "There is one car in the garage.\nHow many cars are in the garage?\nAnswer: one"
+  },
+  {
+    "id": "build_022",
+    "positive": "There are two boats on the lake.\nHow many boats are on the lake?\nAnswer: two",
+    "negative": "There is one boat on the lake.\nHow many boats are on the lake?\nAnswer: one"
+  },
+  {
+    "id": "build_023",
+    "positive": "There are two circles on the page.\nHow many circles are on the page?\nAnswer: two",
+    "negative": "There is one circle on the page.\nHow many circles are on the page?\nAnswer: one"
+  },
+  {
+    "id": "build_024",
+    "positive": "There are two stars in the drawing.\nHow many stars are in the drawing?\nAnswer: two",
+    "negative": "There is one star in the drawing.\nHow many stars are in the drawing?\nAnswer: one"
+  },
+  {
+    "id": "build_025",
+    "positive": "There are two triangles on the board.\nHow many triangles are on the board?\nAnswer: two",
+    "negative": "There is one triangle on the board.\nHow many triangles are on the board?\nAnswer: one"
+  },
+  {
+    "id": "build_026",
+    "positive": "She shared two ideas.\nHow many ideas did she share?\nAnswer: two",
+    "negative": "She shared one idea.\nHow many ideas did she share?\nAnswer: one"
+  },
+  {
+    "id": "build_027",
+    "positive": "He gave two compliments.\nHow many compliments did he give?\nAnswer: two",
+    "negative": "He gave one compliment.\nHow many compliments did he give?\nAnswer: one"
+  },
+  {
+    "id": "build_028",
+    "positive": "She wrote two poems.\nHow many poems did she write?\nAnswer: two",
+    "negative": "She wrote one poem.\nHow many poems did she write?\nAnswer: one"
+  },
+  {
+    "id": "build_029",
+    "positive": "He asked two questions.\nHow many questions did he ask?\nAnswer: two",
+    "negative": "He asked one question.\nHow many questions did he ask?\nAnswer: one"
+  },
+  {
+    "id": "build_030",
+    "positive": "She made two suggestions.\nHow many suggestions did she make?\nAnswer: two",
+    "negative": "She made one suggestion.\nHow many suggestions did she make?\nAnswer: one"
+  },
+  {
+    "id": "build_031",
+    "positive": "He made two promises.\nHow many promises did he make?\nAnswer: two",
+    "negative": "He made one promise.\nHow many promises did he make?\nAnswer: one"
+  },
+  {
+    "id": "build_032",
+    "positive": "She expressed two wishes.\nHow many wishes did she express?\nAnswer: two",
+    "negative": "She expressed one wish.\nHow many wishes did she express?\nAnswer: one"
+  },
+  {
+    "id": "build_033",
+    "positive": "He described two dreams.\nHow many dreams did he describe?\nAnswer: two",
+    "negative": "He described one dream.\nHow many dreams did he describe?\nAnswer: one"
+  },
+  {
+    "id": "build_034",
+    "positive": "She proposed two plans.\nHow many plans did she propose?\nAnswer: two",
+    "negative": "She proposed one plan.\nHow many plans did she propose?\nAnswer: one"
+  },
+  {
+    "id": "build_035",
+    "positive": "He set two goals.\nHow many goals did he set?\nAnswer: two",
+    "negative": "He set one goal.\nHow many goals did he set?\nAnswer: one"
+  },
+  {
+    "id": "build_036",
+    "positive": "She gave two reasons.\nHow many reasons did she give?\nAnswer: two",
+    "negative": "She gave one reason.\nHow many reasons did she give?\nAnswer: one"
+  },
+  {
+    "id": "build_037",
+    "positive": "He presented two arguments.\nHow many arguments did he present?\nAnswer: two",
+    "negative": "He presented one argument.\nHow many arguments did he present?\nAnswer: one"
+  },
+  {
+    "id": "build_038",
+    "positive": "She shared two opinions.\nHow many opinions did she share?\nAnswer: two",
+    "negative": "She shared one opinion.\nHow many opinions did she share?\nAnswer: one"
+  },
+  {
+    "id": "build_039",
+    "positive": "He told two jokes.\nHow many jokes did he tell?\nAnswer: two",
+    "negative": "He told one joke.\nHow many jokes did he tell?\nAnswer: one"
+  },
+  {
+    "id": "build_040",
+    "positive": "She told two stories.\nHow many stories did she tell?\nAnswer: two",
+    "negative": "She told one story.\nHow many stories did she tell?\nAnswer: one"
+  },
+  {
+    "id": "build_041",
+    "positive": "He sang two songs.\nHow many songs did he sing?\nAnswer: two",
+    "negative": "He sang one song.\nHow many songs did he sing?\nAnswer: one"
+  },
+  {
+    "id": "build_042",
+    "positive": "She made two requests.\nHow many requests did she make?\nAnswer: two",
+    "negative": "She made one request.\nHow many requests did she make?\nAnswer: one"
+  },
+  {
+    "id": "build_043",
+    "positive": "He gave two warnings.\nHow many warnings did he give?\nAnswer: two",
+    "negative": "He gave one warning.\nHow many warnings did he give?\nAnswer: one"
+  },
+  {
+    "id": "build_044",
+    "positive": "She gave two instructions.\nHow many instructions did she give?\nAnswer: two",
+    "negative": "She gave one instruction.\nHow many instructions did she give?\nAnswer: one"
+  },
+  {
+    "id": "build_045",
+    "positive": "He gave two examples.\nHow many examples did he give?\nAnswer: two",
+    "negative": "He gave one example.\nHow many examples did he give?\nAnswer: one"
+  },
+  {
+    "id": "build_046",
+    "positive": "She proposed two solutions.\nHow many solutions did she propose?\nAnswer: two",
+    "negative": "She proposed one solution.\nHow many solutions did she propose?\nAnswer: one"
+  },
+  {
+    "id": "build_047",
+    "positive": "He sent two messages.\nHow many messages did he send?\nAnswer: two",
+    "negative": "He sent one message.\nHow many messages did he send?\nAnswer: one"
+  },
+  {
+    "id": "build_048",
+    "positive": "She offered two apologies.\nHow many apologies did she offer?\nAnswer: two",
+    "negative": "She offered one apology.\nHow many apologies did she offer?\nAnswer: one"
+  },
+  {
+    "id": "build_049",
+    "positive": "He received two invitations.\nHow many invitations did he receive?\nAnswer: two",
+    "negative": "He received one invitation.\nHow many invitations did he receive?\nAnswer: one"
+  },
+  {
+    "id": "build_050",
+    "positive": "She shared two thoughts.\nHow many thoughts did she share?\nAnswer: two",
+    "negative": "She shared one thought.\nHow many thoughts did she share?\nAnswer: one"
+  }
+]

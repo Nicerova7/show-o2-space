@@ -8,9 +8,14 @@ Branch: `experiment/custom-steering-vectors`.
 Notebook: [colab-custom-steering.ipynb](colab-custom-steering.ipynb).
 Push this branch before using the Colab link.
 
-This milestone constructs vectors from one contrastive text pair in the understanding
-backbone. It reuses the existing adapter and capture hooks. No activation intervention
-or image generation is added. See [the experiment API](experiments/README.md).
+Counting: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/counting/colab-counting.ipynb)
+or view [the notebook](experiments/counting/colab-counting.ipynb).
+Sections 1–9 build vectors from 50 pairs; sections 10–12 optionally apply them during denoising.
+
+The general notebook constructs vectors from one contrastive text pair in the
+understanding backbone. The counting notebook builds dataset-level vectors and
+provides an optional denoising pilot. Both reuse the existing adapter and capture
+hooks. See [the experiment API](experiments/README.md).
 
 ```python
 from experiments.custom_utils import make_steering_vector

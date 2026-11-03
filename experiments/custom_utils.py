@@ -1,19 +1,20 @@
-"""Build steering directions from one contrastive text pair in Show-o2."""
+"""Build text steering directions and intervene during Show-o2 denoising."""
 from collections.abc import Callable, Sequence
+from contextlib import contextmanager
 from typing import Literal
 
 import torch
 
 from show_o2_space.capture import Capture
 
-Selection = int | Sequence[int] | slice | Literal["all", "last"]
+Selection = int | Sequence[int] | slice | Literal["all", "first", "last"]
 Reduction = Literal["none", "sum", "mean", "average"] | Callable
 DirectionMethod = Literal["difference", "svd"] | Callable
 
 
 def _indices(selection: Selection, length: int) -> list[int]:
     if isinstance(selection, str):
-        return {"all": list(range(length)), "last": [length - 1]}[selection]
+        return {"all": list(range(length)), "first": [0], "last": [length - 1]}[selection]
     if isinstance(selection, slice):
         indices = list(range(length))[selection]
     elif isinstance(selection, int):
@@ -173,3 +174,90 @@ def make_steering_vector(
         layer_reduction=layer_reduction,
         direction_method=direction_method,
     )
+
+
+def add_direction(hidden: torch.Tensor, vector: torch.Tensor, *, alpha: float) -> torch.Tensor:
+    """Add a scaled direction to selected hidden states."""
+    return hidden + alpha * vector
+
+
+def edit_component(hidden: torch.Tensor, vector: torch.Tensor, *, alpha: float) -> torch.Tensor:
+    """Scale the existing component along the unit direction by 1 + alpha."""
+    unit = torch.nn.functional.normalize(vector, dim=-1)
+    return hidden + alpha * (hidden @ unit).unsqueeze(-1) * unit
+
+
+OPERATIONS = {"add": add_direction, "component": edit_component}
+
+
+@contextmanager
+def count_denoising_evaluations(adapter):
+    """Count root model forwards during one adapter.generate call."""
+    trace = {"evaluations": 0}
+
+    def count(module, args):
+        trace["evaluations"] += 1
+
+    handle = adapter.model.register_forward_pre_hook(count)
+    try:
+        yield trace
+    finally:
+        handle.remove()
+
+
+@contextmanager
+def steer_denoising(
+    adapter, *, vectors: dict, total_evaluations: int,
+    layers: Selection = "all", iterations: Selection = "all",
+    text: dict | None = None, visual: dict | None = None,
+):
+    """Edit conditional-row block outputs using Show-o2's current modality offsets."""
+    selected_layers = _indices(layers, len(adapter.layers))
+    selected_iterations = set(_indices(iterations, total_evaluations))
+    rules = {part: rule for part, rule in (("text", text), ("visual", visual)) if rule is not None}
+    trace = {"evaluations": 0, "injections": [], "preview": {}}
+    positions = {}
+    handles = []
+
+    def locate(module, args, kwargs):
+        offset, length = kwargs["modality_positions"][0, 0].tolist()
+        positions["text"] = list(range(1, offset - 1))
+        positions["visual"] = list(range(offset + 1, offset + length))
+        trace["evaluations"] += 1
+
+    def hook(layer):
+        def apply(module, args, output):
+            iteration = trace["evaluations"] - 1
+            if iteration not in selected_iterations:
+                return output
+            hidden = output[0].clone()
+            vector = vectors[layer].to(hidden)
+            for part, rule in rules.items():
+                indices = _indices(rule["tokens"], len(positions[part]))
+                target = [positions[part][i] for i in indices]
+                before = hidden[0, target, :]
+                operation = rule["operation"]
+                operation = operation if callable(operation) else OPERATIONS[operation]
+                after = operation(before, vector, alpha=rule["alpha"])
+                hidden[0, target, :] = after
+                trace["injections"].append(dict(
+                    iteration=iteration, layer=layer, part=part, tokens=len(target),
+                ))
+                key = f"{layer}:{part}"
+                if key not in trace["preview"]:
+                    trace["preview"][key] = dict(
+                        iteration=iteration, position=target[0],
+                        before=before[0, :6].detach().float().cpu(),
+                        after=after[0, :6].detach().float().cpu(),
+                    )
+            return (hidden, *output[1:])
+        return apply
+
+    try:
+        handles.append(adapter.model.register_forward_pre_hook(locate, with_kwargs=True))
+        for layer in selected_layers:
+            handles.append(adapter.layers[layer].register_forward_hook(hook(layer)))
+        yield trace
+    finally:
+        for handle in handles:
+            handle.remove()
