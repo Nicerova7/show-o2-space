@@ -7,7 +7,7 @@ import torch
 
 from experiments.custom_utils import (
     add_direction, build_steering_vector, capture_pair, count_denoising_evaluations,
-    edit_component, estimate_direction, prepare_pair, steer_denoising,
+    edit_component, estimate_direction, prepare_pair, repe_direction, steer_denoising,
 )
 
 
@@ -34,9 +34,10 @@ class Denoiser(torch.nn.Module):
         super().__init__()
         self.showo = SimpleNamespace(model=decoder)
         self.layers = decoder.layers
+        self.dtype = torch.float32
 
     def forward(self, text_tokens, *, modality_positions):
-        hidden = torch.ones(2, 12, 3)
+        hidden = torch.ones(2, 12, 3, dtype=self.dtype)
         for block in self.layers:
             hidden = block(hidden)[0]
         return hidden
@@ -83,6 +84,12 @@ class SteeringTests(unittest.TestCase):
         torch.testing.assert_close(edit_component(hidden, vector, alpha=-1), torch.tensor([[0., 4., 5.]]))
         torch.testing.assert_close(edit_component(hidden, vector, alpha=1), torch.tensor([[6., 4., 5.]]))
 
+    def test_repe_uses_pair_variation_and_unit_norm(self):
+        differences = torch.tensor([[8., 1., 0.], [10., 1., 0.], [14., 1., 0.]])
+        torch.testing.assert_close(repe_direction(differences), torch.tensor([1., 0., 0.]))
+        torch.testing.assert_close(repe_direction(-differences), torch.tensor([-1., 0., 0.]))
+        self.assertEqual(repe_direction(differences).norm().item(), 1.)
+
     def test_modalities_cfg_and_special_positions(self):
         with steer_denoising(
             self.adapter, vectors=self.vectors, total_evaluations=1, layers=0,
@@ -98,6 +105,38 @@ class SteeringTests(unittest.TestCase):
         self.assertEqual(len(trace["injections"]), 2)
         torch.testing.assert_close(trace["preview"]["0:text"]["before"], torch.ones(3))
         torch.testing.assert_close(trace["preview"]["0:text"]["after"], torch.tensor([2., 1., 1.]))
+
+    def test_component_preserves_dtype_under_autocast(self):
+        hidden = torch.tensor([[3., 4., 5.]], dtype=torch.bfloat16)
+        vector = torch.tensor([2., 1., 3.], dtype=torch.bfloat16)
+        unit = torch.nn.functional.normalize(vector.float(), dim=-1)
+        expected = hidden.float() - (hidden.float() @ unit).unsqueeze(-1) * unit
+        with torch.autocast("cpu", dtype=torch.bfloat16):
+            edited = edit_component(hidden, vector, alpha=-1)
+        self.assertEqual(edited.dtype, hidden.dtype)
+        torch.testing.assert_close(edited, expected.to(hidden), rtol=0, atol=0)
+
+    def test_bfloat16_hook_assignment(self):
+        self.adapter.model.dtype = torch.bfloat16
+        with torch.autocast("cpu", dtype=torch.bfloat16), steer_denoising(
+            self.adapter, vectors=self.vectors, total_evaluations=1, layers=0,
+            text=dict(tokens="all", operation="component", alpha=-1),
+        ):
+            result = self.run_forward()
+        self.assertEqual(result.dtype, torch.bfloat16)
+        torch.testing.assert_close(result[0, 1:4, 0], torch.zeros(3, dtype=torch.bfloat16))
+        torch.testing.assert_close(result[1], torch.ones(12, 3, dtype=torch.bfloat16))
+
+        def float_output(hidden, vector, *, alpha):
+            return hidden.float() + alpha * vector.float()
+
+        with steer_denoising(
+            self.adapter, vectors=self.vectors, total_evaluations=1, layers=0,
+            text=dict(tokens="all", operation=float_output, alpha=1),
+        ):
+            result = self.run_forward()
+        self.assertEqual(result.dtype, torch.bfloat16)
+        torch.testing.assert_close(result[0, 1:4, 0], torch.full((3,), 3., dtype=torch.bfloat16))
 
     def test_each_layer_uses_its_own_vector(self):
         with steer_denoising(

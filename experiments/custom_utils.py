@@ -33,6 +33,16 @@ def _reduction_name(reduction: Reduction) -> str:
 REDUCERS = {"sum": torch.sum, "mean": torch.mean, "average": torch.mean}
 
 
+def repe_direction(differences: torch.Tensor) -> torch.Tensor:
+    """Return the first centered principal component of [pairs, hidden] differences."""
+    centered = differences - differences.mean(dim=0, keepdim=True)
+    _, _, vh = torch.linalg.svd(centered, full_matrices=False)
+    direction = vh[0]
+    orientation = torch.dot(direction, differences.mean(dim=0))
+    largest = direction[direction.abs().argmax()]
+    return direction * torch.where(orientation == 0, largest, orientation).sign()
+
+
 def estimate_direction(
     positive: torch.Tensor, negative: torch.Tensor, method: DirectionMethod = "difference",
 ) -> torch.Tensor:
@@ -183,8 +193,11 @@ def add_direction(hidden: torch.Tensor, vector: torch.Tensor, *, alpha: float) -
 
 def edit_component(hidden: torch.Tensor, vector: torch.Tensor, *, alpha: float) -> torch.Tensor:
     """Scale the existing component along the unit direction by 1 + alpha."""
-    unit = torch.nn.functional.normalize(vector, dim=-1)
-    return hidden + alpha * (hidden @ unit).unsqueeze(-1) * unit
+    with torch.autocast(device_type=hidden.device.type, enabled=False):
+        unit = torch.nn.functional.normalize(vector.float(), dim=-1)
+        states = hidden.float()
+        edited = states + alpha * (states @ unit).unsqueeze(-1) * unit
+    return edited.to(hidden)
 
 
 OPERATIONS = {"add": add_direction, "component": edit_component}
@@ -238,7 +251,7 @@ def steer_denoising(
                 before = hidden[0, target, :]
                 operation = rule["operation"]
                 operation = operation if callable(operation) else OPERATIONS[operation]
-                after = operation(before, vector, alpha=rule["alpha"])
+                after = operation(before, vector, alpha=rule["alpha"]).to(hidden)
                 hidden[0, target, :] = after
                 trace["injections"].append(dict(
                     iteration=iteration, layer=layer, part=part, tokens=len(target),

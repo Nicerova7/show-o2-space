@@ -9,7 +9,8 @@ Steps 5 and 6 preview six real coordinates: positive minus negative, then sum di
 The [counting build dataset](../inputs/counting/one_to_two/README.md) provides 50
 simple QA pairs for `one` versus `two`, with supplied answers at the final position.
 Run [the counting notebook](counting/colab-counting.ipynb): sections 1–9 build and
-save one mean-difference vector per layer. Sections 10–12 optionally apply them.
+save one vector per layer. In step 6, run CAA or RepE; results use separate method folders.
+Sections 10–12 optionally apply the selected vectors.
 
 ### API
 
