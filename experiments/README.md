@@ -7,7 +7,8 @@ Run `colab-custom-steering.ipynb` for the stepwise experiment.
 Steps 5 and 6 preview six real coordinates: positive minus negative, then sum divided by token count.
 
 Counting datasets: [QA](../inputs/counting/one_to_two/README.md) and
-[short sentences](../inputs/counting/one_to_two_v2/README.md), 50 pairs each.
+[short sentences](../inputs/counting/one_to_two_v2/README.md), and
+[Cross-Branch format](../inputs/counting/one_to_two_cross_branch/README.md), 50 pairs each.
 Run [the counting notebook](counting/colab-counting.ipynb): sections 1–9 build and
 save one vector per layer. Choose the dataset in step 3 and CAA, RepE, or ITI in step 6.
 Outputs are separated by dataset and method.
