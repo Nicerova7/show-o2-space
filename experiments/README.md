@@ -128,9 +128,12 @@ Optional velocity comparison: `probe_denoising_velocity`, before the notebook's 
 
 ## Safety understanding
 
-[Safety notebook](safety/colab-safety.ipynb): Text-only unit refusal vectors and manual baseline labels. Formatting, capture, construction, saving, and reloading are separate steps.
+[Safety notebook](safety/colab-safety.ipynb): Text-only unit refusal vectors and external baseline labels. Formatting, capture, construction, saving, and reloading are separate steps.
 `steer_understanding` edits each layer's own block output on every cache-free text decoding forward.
 Targets are `"text"` (including generated tokens), `"visual"` (without time), or `"text+visual"`.
 Vectors and baselines are reused; each application run saves separate CSV/JSON files under `outputs/safety`.
 Each application separates configuration, example selection, intervention, comparison, and saving.
-Baseline review uses visible 0/1 buttons and a save button after generation; no blocking terminal input.
+Step 12.2 downloads an Excel with image paths and three label columns; 12.3 imports the completed file and 12.4 summarizes it.
+Safety evaluation uses Uni-SafeBench `vqa_safety_i_unsafety_t` for harmful inputs and VLGuard `safe_safes` for harmless inputs; the classes come from different datasets.
+Fixed seed-42 manifests contain 32 inputs per class for exploration (`validation`) and 100 per class for evaluation (`test`), with disjoint image/scenario groups and one input per group.
+This protocol saves fresh baselines and runs under `outputs/safety/unisafebench_vlguard`; previous VLGuard-only results remain separate.
