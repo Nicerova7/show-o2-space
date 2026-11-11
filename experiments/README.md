@@ -125,3 +125,11 @@ six before/after coordinates per layer/modality. Show-o2 denoising generates no 
 text; autoregressive application is outside this implementation.
 
 Optional velocity comparison: `probe_denoising_velocity`, before the notebook's final save cell.
+
+## Safety understanding
+
+[Safety notebook](safety/colab-safety.ipynb): Text-only unit refusal vectors and manual baseline labels. Formatting, capture, construction, saving, and reloading are separate steps.
+`steer_understanding` edits each layer's own block output on every cache-free text decoding forward.
+Targets are `"text"` (including generated tokens), `"visual"` (without time), or `"text+visual"`.
+Vectors and baselines are reused; each application run saves separate CSV/JSON files under `outputs/safety`.
+Each application separates configuration, example selection, intervention, comparison, and saving.

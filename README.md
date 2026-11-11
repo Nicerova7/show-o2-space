@@ -12,6 +12,9 @@ Counting: [Open in Colab](https://colab.research.google.com/github/Nicerova7/sho
 or view [the notebook](experiments/counting/colab-counting.ipynb).
 Sections 1–9 build vectors from 50 pairs; sections 10–12 optionally apply them during denoising.
 
+Safety: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety/colab-safety.ipynb)
+or view [the notebook](experiments/safety/colab-safety.ipynb). Text-only refusal vectors, manual baseline labels, and image–text understanding interventions.
+
 The general notebook constructs vectors from one contrastive text pair in the
 understanding backbone. The counting notebook builds dataset-level vectors and
 provides an optional denoising pilot. Both reuse the existing adapter and capture

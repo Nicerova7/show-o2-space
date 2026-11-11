@@ -1,9 +1,13 @@
-"""Build text steering directions and intervene during Show-o2 denoising."""
+"""Build text steering directions and intervene in Show-o2 block outputs."""
+import csv
+import json
 from collections.abc import Callable, Sequence
 from contextlib import contextmanager
 from typing import Literal
 
 import torch
+from IPython.display import display
+from PIL import Image
 
 from show_o2_space.capture import Capture
 
@@ -239,6 +243,54 @@ def edit_component(hidden: torch.Tensor, vector: torch.Tensor, *, alpha: float) 
 OPERATIONS = {"add": add_direction, "component": edit_component}
 
 
+def understanding_positions(adapter, alignment: dict, length: int, target: str) -> list[int]:
+    """Select content text, generated text, or image positions without the time token."""
+    special = set(adapter.tokenizer.all_special_ids) | set(adapter.token_ids.values())
+    text = [i for i, token in enumerate(alignment["token_ids"]) if token >= 0 and token not in special]
+    text += list(range(alignment["sequence_length"], length))
+    visual = list(range(*alignment["image_span"]))
+    return {"text": text, "visual": visual, "text+visual": sorted(text + visual)}[target]
+
+
+@contextmanager
+def steer_understanding(
+    adapter, *, vectors: dict, alignment: dict, layers: Selection = "all",
+    target: str = "text", operation: str = "add", coefficient: float = 1.0,
+):
+    """Edit block outputs on every full-prefix forward of the cache-free MMU decoder."""
+    selected_layers = _indices(layers, len(adapter.layers))
+    trace = {"forward_lengths": [], "edited_tokens": {layer: 0 for layer in selected_layers}}
+    positions = []
+    handles = []
+
+    def locate(module, args, kwargs):
+        nonlocal positions
+        length = kwargs["inputs_embeds"].shape[1]
+        positions = understanding_positions(adapter, alignment, length, target)
+        trace["forward_lengths"].append(length)
+
+    def hook(layer):
+        unit = torch.nn.functional.normalize(vectors[layer].float(), dim=-1)
+
+        def apply(module, args, output):
+            hidden = output[0].clone()
+            hidden[:, positions] = OPERATIONS[operation](
+                hidden[:, positions], unit.to(hidden), alpha=coefficient,
+            ).to(hidden)
+            trace["edited_tokens"][layer] += len(positions)
+            return (hidden, *output[1:])
+        return apply
+
+    try:
+        handles.append(adapter.model.showo.model.register_forward_pre_hook(locate, with_kwargs=True))
+        for layer in selected_layers:
+            handles.append(adapter.layers[layer].register_forward_hook(hook(layer)))
+        yield trace
+    finally:
+        for handle in handles:
+            handle.remove()
+
+
 @torch.no_grad()
 def probe_denoising_velocity(
     adapter, prompt: str, *, vectors: dict, generation_kwargs: dict,
@@ -358,3 +410,41 @@ def steer_denoising(
     finally:
         for handle in handles:
             handle.remove()
+
+
+def save_json(path, value):
+    path.write_text(json.dumps(value, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def save_table(path, rows):
+    save_json(path.with_suffix(".json"), rows)
+    with path.with_suffix(".csv").open("w", newline="", encoding="utf-8-sig") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def show_example(output, example, instruction, baseline, steered=None):
+    with Image.open(output / example["image"]) as source:
+        display(source.copy().resize((320, 320)))
+    print("Instruction:", instruction)
+    print("Baseline:", baseline)
+    if steered is not None:
+        print("Steered:", steered)
+
+
+def summarize(rows, response="baseline"):
+    for group in ("harmful", "harmless"):
+        selected = [row for row in rows if row["instruction_type"] == group]
+        labels = [str(row[f"{response}_refusal"]) for row in selected
+                  if str(row[f"{response}_refusal"]) in ("0", "1")]
+        refused = labels.count("1")
+        rate = f"{refused / len(labels):.1%}" if labels else "unlabelled"
+        incoherent = sum(str(row[f"{response}_incoherent"]) == "1" for row in selected)
+        irrelevant = sum(str(row[f"{response}_irrelevant"]) == "1" for row in selected)
+        flagged_labels = {field: sum(str(row[f"{response}_{field}"]) in ("0", "1") for row in selected)
+                          for field in ("incoherent", "irrelevant")}
+        print(f"{group}: {len(selected)} responses | labelled {len(labels)} | "
+              f"refused {refused} | non-refused {labels.count('0')} | refusal rate {rate} | "
+              f"incoherent {incoherent}/{flagged_labels['incoherent']} labelled | "
+              f"irrelevant {irrelevant}/{flagged_labels['irrelevant']} labelled")
