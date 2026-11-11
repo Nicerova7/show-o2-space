@@ -133,3 +133,4 @@ Optional velocity comparison: `probe_denoising_velocity`, before the notebook's 
 Targets are `"text"` (including generated tokens), `"visual"` (without time), or `"text+visual"`.
 Vectors and baselines are reused; each application run saves separate CSV/JSON files under `outputs/safety`.
 Each application separates configuration, example selection, intervention, comparison, and saving.
+Baseline review uses visible 0/1 buttons and a save button after generation; no blocking terminal input.
