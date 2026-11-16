@@ -1,0 +1,14 @@
+{
+  "dataset": "NASK-PIB/SafeSteerDataset",
+  "source_sha256": {
+    "train.parquet": "62736980c93932a0ba1813b219aa851c8e5b5ae8d46c06a0ea1928e84081a4cb",
+    "test.parquet": "397e37d7e94af7a21b1d24f7859d843466962994c37132aa7ee6991b2dd011ad"
+  },
+  "source_index": "zero-based row in the supplied parquet file",
+  "custom_splits": true,
+  "selection": "explicit prompt inspection before model generation",
+  "counts": {
+    "validation": 32,
+    "test": 50
+  }
+}

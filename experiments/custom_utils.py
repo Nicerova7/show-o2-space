@@ -356,13 +356,13 @@ def count_denoising_evaluations(adapter):
 
 @contextmanager
 def steer_denoising(
-    adapter, *, vectors: dict, total_evaluations: int,
+    adapter, *, vectors: dict, total_evaluations: int | None = None,
     layers: Selection = "all", iterations: Selection = "all",
     text: dict | None = None, visual: dict | None = None,
 ):
-    """Edit conditional-row block outputs using Show-o2's current modality offsets."""
+    """Edit conditional-row block outputs; total_evaluations is only needed for selected iterations."""
     selected_layers = _indices(layers, len(adapter.layers))
-    selected_iterations = set(_indices(iterations, total_evaluations))
+    selected_iterations = None if iterations == "all" else set(_indices(iterations, total_evaluations))
     rules = {part: rule for part, rule in (("text", text), ("visual", visual)) if rule is not None}
     trace = {"evaluations": 0, "injections": [], "preview": {}}
     positions = {}
@@ -377,7 +377,7 @@ def steer_denoising(
     def hook(layer):
         def apply(module, args, output):
             iteration = trace["evaluations"] - 1
-            if iteration not in selected_iterations:
+            if selected_iterations is not None and iteration not in selected_iterations:
                 return output
             hidden = output[0].clone()
             vector = vectors[layer].to(hidden)

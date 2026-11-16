@@ -1,5 +1,13 @@
 # Experiments
 
+## Safety transfer U→G
+
+[Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-u2g-shared.ipynb)
+— [instructions](safety-transfer/README.md). Same 128/128 refusal extraction;
+32/32 validation and 50/50 test prompts; additive steering on shared-backbone
+text tokens; manual labels imported from Excel. Flow-head intervention will use
+a separate notebook in the same folder.
+
 ## Custom steering vectors
 
 `custom_utils.py` reuses `show_o2_space.capture.Capture` and the loaded adapter.

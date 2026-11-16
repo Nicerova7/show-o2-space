@@ -1,5 +1,8 @@
 # show-o2-space
 
+Safety transfer U→G: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-u2g-shared.ipynb)
+or view [the experiment](experiments/safety-transfer/README.md). Shared-backbone text-only additive steering, 32-pair strength selection, 50-pair test, and manual Excel review. Push the branch before opening Colab.
+
 ## Custom steering vector experiment
 
 Branch: `experiment/custom-steering-vectors`.
