@@ -1,8 +1,5 @@
 # show-o2-space
 
-Safety transfer U→G: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-u2g-shared.ipynb)
-or view [the experiment](experiments/safety-transfer/README.md). Shared-backbone text-only additive steering, 32-pair strength selection, 50-pair test, and manual Excel review. Push the branch before opening Colab.
-
 ## Custom steering vector experiment
 
 Branch: `experiment/custom-steering-vectors`.
@@ -17,6 +14,11 @@ Sections 1–9 build vectors from 50 pairs; sections 10–12 optionally apply th
 
 Safety: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety/colab-safety.ipynb)
 or view [the notebook](experiments/safety/colab-safety.ipynb). Text-only refusal vectors, manual baseline labels, and image–text understanding interventions.
+
+Safety transfer U→G: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-u2g-shared.ipynb)
+or view [the notebook](experiments/safety-transfer/colab-u2g-shared.ipynb).
+Refusal vectors from 128/128 instructions, additive steering on shared-backbone text tokens during image generation, 32-pair strength selection, 50-pair test, and manual Excel review.
+See [the experiment instructions](experiments/safety-transfer/README.md).
 
 The general notebook constructs vectors from one contrastive text pair in the
 understanding backbone. The counting notebook builds dataset-level vectors and
