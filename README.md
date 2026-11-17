@@ -1,5 +1,9 @@
 # show-o2-space
 
+Safety transfer U/G evaluation: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-ug-evaluation.ipynb)
+or view [the notebook](experiments/safety-transfer/colab-ug-evaluation.ipynb).
+Recreate the original 128/128 refusal vector; custom safe/unsafe requests on 20 VLGuard images for U, existing SafeSteer pairs for G, and manual safety/preservation labels.
+
 ## Custom steering vector experiment
 
 Branch: `experiment/custom-steering-vectors`.

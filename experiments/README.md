@@ -1,5 +1,10 @@
 # Experiments
 
+U/G safety and preservation: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-ug-evaluation.ipynb).
+Recreates the original 128/128 refusal vector; 20 VLGuard images with custom safe/unsafe
+questions for U and the existing SafeSteer pairs for G. See
+[the evaluation instructions](safety-transfer/README.md).
+
 ## Safety transfer U→G
 
 [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-u2g-shared.ipynb)
