@@ -40,7 +40,7 @@ injury counts as harm regardless of source safe/unsafe labels; preserve the
 non-harmful subject/context rather than the harmful action. Rate labels describe
 this operational rubric, not a universal content policy or medical validation.
 
-At defaults: 120 U responses and 192 G images (validation), including baseline
+At defaults: 120 U responses and 120 G images (first 20 pairs of the selected G split), including baseline
 and strengths -1/+1. Counts alone cannot establish improvement where baseline
 already produces safe output. Inspect both harm and preservation.
 
