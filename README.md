@@ -1,9 +1,5 @@
 # show-o2-space
 
-Safety transfer U/G evaluation: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-ug-evaluation.ipynb)
-or view [the notebook](experiments/safety-transfer/colab-ug-evaluation.ipynb).
-Recreate the original 128/128 refusal vector; custom safe/unsafe requests on 20 VLGuard images for U, existing SafeSteer pairs for G, and manual safety/preservation labels.
-
 ## Custom steering vector experiment
 
 Branch: `experiment/custom-steering-vectors`.
@@ -19,9 +15,17 @@ Sections 1–9 build vectors from 50 pairs; sections 10–12 optionally apply th
 Safety: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety/colab-safety.ipynb)
 or view [the notebook](experiments/safety/colab-safety.ipynb). Text-only refusal vectors, manual baseline labels, and image–text understanding interventions.
 
-Safety transfer U→G: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-u2g-shared.ipynb)
-or view [the notebook](experiments/safety-transfer/colab-u2g-shared.ipynb).
-Refusal vectors from 128/128 instructions, additive steering on shared-backbone text tokens during image generation, 32-pair strength selection, 50-pair test, and manual Excel review.
+## Safety transfer — Show-o2
+
+1. **U→G — shared backbone.** [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-u2g-shared.ipynb) · [Notebook](experiments/safety-transfer/colab-u2g-shared.ipynb).
+   Refusal vectors from 128/128 instructions; additive steering on prompt text during generation.
+   [U/G evaluation in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-ug-evaluation.ipynb) · [Evaluation notebook](experiments/safety-transfer/colab-ug-evaluation.ipynb): 20 VLGuard images with custom safe/unsafe questions for U, 20 SafeSteer pairs for G, and manual harm/preservation labels. This evaluates the U-derived vector in both tasks; it is not G→U.
+2. **G→U — shared backbone.** Planned; no notebook yet. Extract a non-graphic-minus-graphic direction from visual generation states and apply it to text during understanding.
+3. **Generation-specific flow head.**
+
+   - **U→G:** [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-u2g-flow-head.ipynb) · [Notebook](experiments/safety-transfer/colab-u2g-flow-head.ipynb). One selectable U source layer; additive steering in the 10 flow-head blocks, text/visual/both targets, two-strength preview and manual G review.
+   - **G→U:** Planned; no notebook yet. Extract a non-graphic-minus-graphic direction from visual states in the flow head, map it into the understanding representation space and apply it to text during understanding.
+
 See [the experiment instructions](experiments/safety-transfer/README.md).
 
 The general notebook constructs vectors from one contrastive text pair in the

@@ -1,5 +1,7 @@
 # Experiments
 
+Flow-head U→G: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-u2g-flow-head.ipynb) — [notebook](safety-transfer/colab-u2g-flow-head.ipynb). One selectable U layer, 10 flow-head blocks, text/visual/both targets, two-strength preview and manual G review.
+
 U/G safety and preservation: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-ug-evaluation.ipynb).
 Recreates the original 128/128 refusal vector; 20 VLGuard images with custom safe/unsafe
 questions for U and the existing SafeSteer pairs for G. See
@@ -10,8 +12,8 @@ questions for U and the existing SafeSteer pairs for G. See
 [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-u2g-shared.ipynb)
 — [instructions](safety-transfer/README.md). Same 128/128 refusal extraction;
 32/32 validation and 50/50 test prompts; additive steering on shared-backbone
-text tokens; manual labels imported from Excel. Flow-head intervention will use
-a separate notebook in the same folder.
+text tokens; manual labels imported from Excel. Flow-head intervention uses
+`colab-u2g-flow-head.ipynb` in the same folder.
 
 ## Custom steering vectors
 

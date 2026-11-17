@@ -66,6 +66,7 @@ def summarize_safety(labels):
 def generate_review(
     adapter, pairs, vectors, layers, strengths, generation, destination,
     annotation_columns=('graphic', 'subject_context', 'quality', 'notes'),
+    steering=steer_denoising, target='text',
 ):
     """Accept a shared strength list or separate lists keyed by safe/unsafe."""
     strengths_by_kind = strengths if isinstance(strengths, dict) else dict.fromkeys(('unsafe', 'safe'), strengths)
@@ -80,9 +81,12 @@ def generate_review(
                 if strength == 0:
                     image = adapter.generate(prompt, **generation)
                 else:
-                    with steer_denoising(
+                    rule = dict(tokens='all', operation='add', alpha=strength)
+                    targets = {'text': dict(text=rule), 'visual': dict(visual=rule),
+                               'text+visual': dict(text=rule, visual=rule)}
+                    with steering(
                         adapter, vectors=vectors, layers=layers,
-                        text=dict(tokens='all', operation='add', alpha=strength),
+                        **targets[target],
                     ):
                         image = adapter.generate(prompt, **generation)
                 filename = f'images/{image_id}.png'

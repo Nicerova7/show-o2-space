@@ -1,5 +1,7 @@
 # Safety transfer
 
+Flow-head U→G: [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-u2g-flow-head.ipynb) — [notebook](colab-u2g-flow-head.ipynb). One selectable U layer, 10 flow-head blocks, text/visual/both targets, two-strength preview and manual G review.
+
 ## U/G safety and preservation evaluation
 
 [Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-ug-evaluation.ipynb)
@@ -88,8 +90,11 @@ some non-malicious assistance after injury: graphicness and harmful intent diffe
 Safe prompts are controls, not exact pixel or scene targets. The unchanged 128/128
 extraction sample has not been individually remapped here.
 
-The generation-specific flow-head intervention belongs in a separate future
-notebook in this directory. G→U is also outside this notebook.
+The generation-specific flow-head intervention is in `colab-u2g-flow-head.ipynb`. G→U is also outside this notebook.
 
 Local checks cover notebook syntax, split counts and synthetic hooks/metrics.
 Actual Show-o2 generation and GPU behavior require running Colab.
+
+## Flow-head transport
+
+Run the new notebook in order. Steps 3.1–3.7 separate sampling, formatting, U layer selection, capture, subtraction, transport and saving. The existing projection is nonlinear: `P(v) - P(0)` removes its zero-input output but is a heuristic, not an exact displacement at real activations. Normalization occurs before and after transport. The same head direction is added at selected block outputs, with the backbone unmodified. All 10 head blocks and text are defaults; visual excludes time and special tokens. GPU inference must be checked in Colab.

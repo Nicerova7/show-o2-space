@@ -358,10 +358,11 @@ def count_denoising_evaluations(adapter):
 def steer_denoising(
     adapter, *, vectors: dict, total_evaluations: int | None = None,
     layers: Selection = "all", iterations: Selection = "all",
-    text: dict | None = None, visual: dict | None = None,
+    text: dict | None = None, visual: dict | None = None, blocks=None,
 ):
     """Edit conditional-row block outputs; total_evaluations is only needed for selected iterations."""
-    selected_layers = _indices(layers, len(adapter.layers))
+    blocks = adapter.layers if blocks is None else blocks
+    selected_layers = _indices(layers, len(blocks))
     selected_iterations = None if iterations == "all" else set(_indices(iterations, total_evaluations))
     rules = {part: rule for part, rule in (("text", text), ("visual", visual)) if rule is not None}
     trace = {"evaluations": 0, "injections": [], "preview": {}}
@@ -405,7 +406,7 @@ def steer_denoising(
     try:
         handles.append(adapter.model.register_forward_pre_hook(locate, with_kwargs=True))
         for layer in selected_layers:
-            handles.append(adapter.layers[layer].register_forward_hook(hook(layer)))
+            handles.append(blocks[layer].register_forward_hook(hook(layer)))
         yield trace
     finally:
         for handle in handles:
