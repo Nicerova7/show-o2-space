@@ -359,8 +359,9 @@ def steer_denoising(
     adapter, *, vectors: dict, total_evaluations: int | None = None,
     layers: Selection = "all", iterations: Selection = "all",
     text: dict | None = None, visual: dict | None = None, blocks=None,
+    site: Literal["input", "output"] = "output",
 ):
-    """Edit conditional-row block outputs; total_evaluations is only needed for selected iterations."""
+    """Edit conditional-row block inputs or outputs; default is output."""
     blocks = adapter.layers if blocks is None else blocks
     selected_layers = _indices(layers, len(blocks))
     selected_iterations = None if iterations == "all" else set(_indices(iterations, total_evaluations))
@@ -403,10 +404,25 @@ def steer_denoising(
             return (hidden, *output[1:])
         return apply
 
+    def input_hook(layer):
+        edit = hook(layer)
+
+        def apply(module, args, kwargs):
+            if args:
+                hidden = edit(module, args, (args[0],))[0]
+                return (hidden, *args[1:]), kwargs
+            hidden = edit(module, args, (kwargs["hidden_states"],))[0]
+            return args, dict(kwargs, hidden_states=hidden)
+        return apply
+
     try:
         handles.append(adapter.model.register_forward_pre_hook(locate, with_kwargs=True))
         for layer in selected_layers:
-            handles.append(blocks[layer].register_forward_hook(hook(layer)))
+            if site == "input":
+                handle = blocks[layer].register_forward_pre_hook(input_hook(layer), with_kwargs=True)
+            else:
+                handle = blocks[layer].register_forward_hook(hook(layer))
+            handles.append(handle)
         yield trace
     finally:
         for handle in handles:

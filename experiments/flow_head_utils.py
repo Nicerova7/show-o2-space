@@ -19,9 +19,9 @@ def project_flow_direction(adapter, vector):
 
 @contextmanager
 def steer_flow_head(adapter, *, vectors, layers="all", text=None, visual=None):
-    """Apply the existing conditional-row hook to flow-head block outputs."""
+    """Add steering at flow-head block inputs, before attention."""
     with steer_denoising(
         adapter, vectors=vectors, layers=layers, text=text, visual=visual,
-        blocks=adapter.model.diffusion_head_a,
+        blocks=adapter.model.diffusion_head_a, site="input",
     ) as trace:
         yield trace
