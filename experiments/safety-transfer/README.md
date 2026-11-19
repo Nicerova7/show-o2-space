@@ -114,3 +114,11 @@ Extraction modality is selected independently using `extraction_target = "text"`
 `text_tokens` selects `"first"`, `"last"`, or `"average"` over prompt content tokens (special/padding tokens excluded). New captures save all three statistics for reselection without regeneration. Existing mean-only text captures need recapture for first/last. Visual extraction always averages all image tokens.
 
 Text uses its own `text_extraction_step = "last"` by default: one model evaluation only (`"last"`, `"middle"`, or an integer). Lists and `"all"` are rejected for text. Visual retains `extraction_steps`. Combined extraction averages the selected text representation and selected visual representation equally. `text_tokens = "average"` pools text tokens, not denoising evaluations.
+
+## G-to-U shared-backbone evaluation
+
+[Open in Colab](https://colab.research.google.com/github/Nicerova7/show-o2-space/blob/experiment/custom-steering-vectors/experiments/safety-transfer/colab-g2u-shared.ipynb) | [Notebook](colab-g2u-shared.ipynb). Independent execution: load the model, download the same 50 NSFWCaps pairs, generate both sides, capture states and construct vectors here. No vector upload or previous notebook runtime is required.
+
+Sections 3-5 reproduce the current G construction, with the same editable text/visual/both extraction, token and timestep selectors. Defaults use text, last content token and last denoising evaluation; non-graphic minus graphic is normalized per backbone layer. Generations, pooled states, vectors and metadata are saved in this notebook's own run folder.
+
+Section 6 downloads the same 20 VLGuard images and 40 custom safe/unsafe questions. Section 7 previews one pair; section 8 runs all 40 inputs with baseline and two strengths, then downloads images, answers and review.xlsx. Section 9 accepts manual harm/preservation/refusal labels and exports metrics and the complete run. Default additive text steering uses all backbone block outputs and strengths -3/0/+3 (120 answers). Colab GPU execution remains unverified.

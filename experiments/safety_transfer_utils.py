@@ -24,7 +24,7 @@ def export_review(review, destination):
             )
 
 
-def generate_u_review(adapter, pairs, vectors, layers, strengths, seed, destination):
+def generate_u_review(adapter, pairs, vectors, layers, strengths, seed, destination, target="text"):
     """Run image + custom safe/unsafe prompts with fixed inputs and seed."""
     rows = []
     for pair in pairs:
@@ -39,7 +39,7 @@ def generate_u_review(adapter, pairs, vectors, layers, strengths, seed, destinat
                 else:
                     with steer_understanding(
                         adapter, vectors=vectors, alignment=alignment, layers=layers,
-                        target='text', operation='add', coefficient=strength,
+                        target=target, operation='add', coefficient=strength,
                     ):
                         answer = adapter.answer(embeddings.clone(), mask.clone(), max_new_tokens=192)
                 rows.append(dict(
