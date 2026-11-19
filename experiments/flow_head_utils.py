@@ -1,4 +1,4 @@
-"""Transport a U direction and reuse the denoising hook in the flow head."""
+"""Transport backbone directions and reuse the denoising hook in the flow head."""
 from contextlib import contextmanager
 
 import torch
@@ -18,10 +18,12 @@ def project_flow_direction(adapter, vector):
 
 
 @contextmanager
-def steer_flow_head(adapter, *, vectors, layers="all", text=None, visual=None):
+def steer_flow_head(adapter, *, vectors, layers="all", text=None, visual=None,
+                    total_evaluations=None, iterations="all"):
     """Add steering at flow-head block inputs, before attention."""
     with steer_denoising(
         adapter, vectors=vectors, layers=layers, text=text, visual=visual,
         blocks=adapter.model.diffusion_head_a, site="input",
+        total_evaluations=total_evaluations, iterations=iterations,
     ) as trace:
         yield trace

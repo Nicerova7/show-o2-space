@@ -14,9 +14,10 @@ def denoising_steps(selection, total):
 
 
 @contextmanager
-def capture_generation(adapter):
-    """Pool each modality separately at every backbone block output."""
-    states = {layer: [] for layer in range(len(adapter.layers))}
+def capture_generation(adapter, component="backbone"):
+    """Capture backbone outputs or flow-head inputs, pooling each modality."""
+    blocks = adapter.layers if component == "backbone" else adapter.model.diffusion_head_a
+    states = {layer: [] for layer in range(len(blocks))}
     text_states = {layer: [] for layer in states}
     text_first = {layer: [] for layer in states}
     text_last = {layer: [] for layer in states}
@@ -33,19 +34,27 @@ def capture_generation(adapter):
         positions["text"] = text[~torch.isin(tokens[text], special)]
         trace["times"].append(float(kwargs["t"].flatten()[0]))
 
+    def record(layer, hidden):
+        states[layer].append(hidden[0, positions["visual"]].detach().float().mean(0).cpu())
+        text_states[layer].append(hidden[0, positions["text"]].detach().float().mean(0).cpu())
+        text_first[layer].append(hidden[0, positions["text"][0]].detach().float().cpu())
+        text_last[layer].append(hidden[0, positions["text"][-1]].detach().float().cpu())
+
     def hook(layer):
         def capture(module, args, output):
-            pooled = output[0][0, positions["visual"]].detach().float().mean(0)
-            states[layer].append(pooled.cpu())
-            pooled_text = output[0][0, positions["text"]].detach().float().mean(0)
-            text_states[layer].append(pooled_text.cpu())
-            text_first[layer].append(output[0][0, positions["text"][0]].detach().float().cpu())
-            text_last[layer].append(output[0][0, positions["text"][-1]].detach().float().cpu())
+            record(layer, output[0])
+        return capture
+
+    def input_hook(layer):
+        def capture(module, args, kwargs):
+            record(layer, args[0] if args else kwargs["hidden_states"])
         return capture
 
     handles = [adapter.model.register_forward_pre_hook(locate, with_kwargs=True)]
-    handles.extend(block.register_forward_hook(hook(layer))
-                   for layer, block in enumerate(adapter.layers))
+    for layer, block in enumerate(blocks):
+        handle = (block.register_forward_hook(hook(layer)) if component == "backbone"
+                  else block.register_forward_pre_hook(input_hook(layer), with_kwargs=True))
+        handles.append(handle)
     try:
         yield trace
     finally:
